@@ -142,6 +142,16 @@ export class ApiProspectDataStore implements ProspectDataStore, StudentDataStore
     return response.ok;
   }
 
+  async getAllFollowUps(): Promise<FollowUpAction[]> {
+    const response = await fetch(`${API_BASE_URL}/followups`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch all follow-ups');
+    }
+    return response.json();
+  }
+
   // --- Student Methods ---
 
   async addStudent(studentData: StudentFormData): Promise<Student> {
