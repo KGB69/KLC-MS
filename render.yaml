@@ -19,4 +19,4 @@ services:
 databases:
   - name: klc-ms-db
     plan: free
-    region: oregan
+    region: oregon
