@@ -35,7 +35,7 @@ app.use(cors());
 app.use(express.json());
 
 // Serve static files from the React app build
-app.use(express.static(path.join(__dirname, '../dist')));
+app.use(express.static(path.join(__dirname, '../../dist')));
 
 // --- Authentication Middleware ---
 interface AuthRequest extends Request {
@@ -306,7 +306,7 @@ app.post('/api/followups', authenticateToken, async (req: AuthRequest, res: Resp
 
 // --- Catch-all to serve React's index.html (SPA support) ---
 app.get(/^\/(?!api).*/, (req: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, '../dist/index.html'));
+    res.sendFile(path.join(__dirname, '../../dist/index.html'));
 });
 
 app.listen(port, () => {
