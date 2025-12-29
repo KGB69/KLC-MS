@@ -305,7 +305,7 @@ app.post('/api/followups', authenticateToken, async (req: AuthRequest, res: Resp
 });
 
 // --- Catch-all to serve React's index.html (SPA support) ---
-app.get('*', (req: Request, res: Response) => {
+app.get('/:path*', (req: Request, res: Response) => {
     res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
