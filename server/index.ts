@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express, { type Request, type Response, type NextFunction } from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -18,8 +18,8 @@ const toCamel = (obj: any): any => {
     }
     const n: any = {};
     Object.keys(obj).forEach(k => {
-        const camelKey = k.replace(/(_\w)/g, m => m[1].toUpperCase());
-        n[camelKey] = toCamel(obj[k]);
+        const camelKey = k.replace(/(_\w)/g, (m: string) => m[1].toUpperCase());
+        n[camelKey] = toCamel((obj as any)[k]);
     });
     return n;
 };
@@ -38,11 +38,11 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../dist')));
 
 // --- Authentication Middleware ---
-interface AuthRequest extends Request {
+interface AuthRequest extends express.Request {
     user?: any;
 }
 
-const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction) => {
+const authenticateToken = (req: AuthRequest, res: express.Response, next: express.NextFunction) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
