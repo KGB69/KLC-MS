@@ -38,7 +38,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../dist')));
 
 // --- Authentication Middleware ---
-interface AuthRequest extends express.Request {
+interface AuthRequest extends Request {
     user?: any;
 }
 
@@ -193,8 +193,8 @@ app.get('/api/classes', authenticateToken, async (req: AuthRequest, res: Respons
             const students = await query('SELECT student_id FROM student_enrollments WHERE class_id = $1', [cls.class_id]);
             return {
                 ...cls,
-                schedule: schedules.rows,
-                studentIds: students.rows.map(r => r.student_id)
+                schedule: (schedules.rows as any[]),
+                studentIds: (students.rows as any[]).map((r: any) => r.student_id)
             };
         }));
         res.json(toCamel(classes));
