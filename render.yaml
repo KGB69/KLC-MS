@@ -14,11 +14,9 @@ services:
         generateValue: true
       - key: NODE_ENV
         value: production
-    mounts:
-      - path: /dist
-        name: dist
     autoDeploy: true
 
 databases:
   - name: klc-ms-db
     plan: free
+    region: oregan
