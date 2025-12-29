@@ -1,0 +1,5 @@
+{
+  "name": "Prospect Management CRM",
+  "description": "A simple CRM application to manage potential customer (prospect) data, including contact information, services of interest, and notes. Allows for adding, viewing, and filtering prospects.",
+  "requestFramePermissions": []
+}

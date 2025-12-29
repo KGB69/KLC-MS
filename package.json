@@ -1,0 +1,30 @@
+{
+  "name": "prospect-management-crm",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev:frontend": "vite",
+    "dev:backend": "cd server && npm run dev",
+    "dev": "npm run dev:frontend",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "start": "cd server && npm start"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "echarts": "^6.0.0",
+    "echarts-for-react": "^3.0.5",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "recharts": "^3.6.0",
+    "zod": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0",
+    "vite-plugin-pwa": "^1.2.0"
+  }
+}
