@@ -64,18 +64,18 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ onSubmit, onCancel, initialDa
 
       try {
         const clientPayments = await dataStore.getPaymentsForClient(formData.clientId);
-        let totalPaid = clientPayments.reduce((sum, p) => sum + p.amount, 0);
+        let totalPaid = clientPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
 
         // If editing, subtract the current payment's amount from totalPaid
         if (isEditing && initialData && initialData.clientId === formData.clientId) {
-          totalPaid -= initialData.amount;
+          totalPaid -= (Number(initialData.amount) || 0);
         }
 
-        const balance = selectedClient.totalFee - totalPaid;
+        const balance = (Number(selectedClient.totalFee) || 0) - totalPaid;
         setOutstandingBalance(balance);
       } catch (err) {
         console.error("Failed to fetch payments for balance calculation", err);
-        setOutstandingBalance(selectedClient.totalFee); // Default to total fee on error
+        setOutstandingBalance(0); // Default to 0 on error
       } finally {
         setIsLoadingBalance(false);
       }
@@ -110,11 +110,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ onSubmit, onCancel, initialDa
       alert("Please select a client and enter a valid payment amount.");
       return;
     }
-    const remainingBalance = outstandingBalance - formData.amount;
-    onSubmit({ ...formData, balance: remainingBalance, balanceCurrency: formData.currency });
+    const amount = Number(formData.amount) || 0;
+    const remainingBalance = outstandingBalance - amount;
+    onSubmit({ ...formData, amount: amount, balance: remainingBalance, balanceCurrency: formData.currency });
   };
 
-  const newBalance = outstandingBalance - formData.amount;
+  const newBalance = outstandingBalance - (Number(formData.amount) || 0);
 
   return (
     <Modal
