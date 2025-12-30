@@ -142,3 +142,19 @@ CREATE TABLE IF NOT EXISTS expenditures (
     created_by UUID REFERENCES users(id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Communications/Tasks
+CREATE TABLE IF NOT EXISTS communications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    type TEXT NOT NULL, -- 'prospect-followup' or 'general'
+    title TEXT NOT NULL,
+    description TEXT,
+    prospect_id UUID REFERENCES prospects(id) ON DELETE CASCADE,
+    assigned_to TEXT NOT NULL, -- Username or 'Everyone'
+    due_date DATE NOT NULL,
+    status TEXT DEFAULT 'Pending',
+    priority TEXT DEFAULT 'medium',
+    outcome TEXT,
+    created_by UUID REFERENCES users(id),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);

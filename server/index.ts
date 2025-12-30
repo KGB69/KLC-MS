@@ -342,6 +342,68 @@ app.delete('/api/expenditures/:id', authenticateToken, async (req: AuthRequest, 
     }
 });
 
+// --- Communication Routes ---
+
+app.get('/api/communications', authenticateToken, async (req: AuthRequest, res: Response) => {
+    try {
+        const result = await query(`
+            SELECT c.*, u.username as created_by_username 
+            FROM communications c 
+            LEFT JOIN users u ON c.created_by = u.id 
+            ORDER BY c.due_date ASC
+        `);
+        res.json(toCamel(result.rows));
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to fetch communications' });
+    }
+});
+
+app.post('/api/communications', authenticateToken, async (req: AuthRequest, res: Response) => {
+    const { type, title, description, prospectId, assignedTo, dueDate, priority } = req.body;
+    try {
+        const result = await query(
+            `INSERT INTO communications (type, title, description, prospect_id, assigned_to, due_date, priority, created_by) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+            [type, title, description, prospectId || null, assignedTo, dueDate, priority, req.user.id]
+        );
+        res.status(201).json(toCamel(result.rows[0]));
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to add communication' });
+    }
+});
+
+app.put('/api/communications/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    const { status, outcome, title, description, dueDate, priority, assignedTo } = req.body;
+    try {
+        const result = await query(
+            `UPDATE communications SET status = COALESCE($1, status), outcome = COALESCE($2, outcome), 
+             title = COALESCE($3, title), description = COALESCE($4, description), 
+             due_date = COALESCE($5, due_date), priority = COALESCE($6, priority),
+             assigned_to = COALESCE($7, assigned_to)
+             WHERE id = $8 RETURNING *`,
+            [status, outcome, title, description, dueDate, priority, assignedTo, id]
+        );
+        res.json(toCamel(result.rows[0]));
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to update communication' });
+    }
+});
+
+app.delete('/api/communications/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    try {
+        await query('DELETE FROM communications WHERE id = $1', [id]);
+        res.status(204).send();
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to delete communication' });
+    }
+});
+
 // --- Catch-all to serve React's index.html (SPA support) ---
 app.get(/^\/(?!api).*/, (req: Request, res: Response) => {
     res.sendFile(path.join(__dirname, '../../dist/index.html'));

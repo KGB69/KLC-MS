@@ -1,7 +1,7 @@
 import {
   Prospect, ProspectFormData, FollowUpAction, Student, StudentFormData,
   Class, ClassFormData, Payment, PaymentFormData, Expenditure, ExpenditureFormData,
-  SearchCriteria, Communication
+  SearchCriteria, Communication, CommunicationFormData
 } from '../types';
 
 const API_BASE_URL = '/api';
@@ -336,8 +336,38 @@ export class ApiProspectDataStore {
 
   // --- Communication Methods ---
   async getAllCommunications(): Promise<Communication[]> {
-    // Communications are not yet implemented in the backend
-    // Return empty array for now to prevent errors
-    return [];
+    const response = await fetch(`${API_BASE_URL}/communications`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch communications');
+    return response.json();
+  }
+
+  async addCommunication(data: CommunicationFormData): Promise<Communication> {
+    const response = await fetch(`${API_BASE_URL}/communications`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error('Failed to add communication');
+    return response.json();
+  }
+
+  async updateCommunication(id: string, updates: Partial<Communication>): Promise<Communication | undefined> {
+    const response = await fetch(`${API_BASE_URL}/communications/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(updates)
+    });
+    if (!response.ok) throw new Error('Failed to update communication');
+    return response.json();
+  }
+
+  async deleteCommunication(id: string): Promise<boolean> {
+    const response = await fetch(`${API_BASE_URL}/communications/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    return response.ok;
   }
 }
