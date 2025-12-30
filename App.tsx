@@ -619,13 +619,10 @@ const App: React.FC = () => {
             <TasksView prospectStore={prospectStore} />
           )}
 
-          {activeView === 'dashboard' && (
-            <DashboardView prospectStore={prospectStore} onNavigate={setActiveView} />
-          )}
-
           {activeView === 'finance' && (
             <FinanceManagement dataStore={prospectStore} />
           )}
+
 
 
           <Modal
