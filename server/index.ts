@@ -323,7 +323,7 @@ app.post('/api/followups', authenticateToken, async (req: AuthRequest, res: Resp
 app.delete('/api/payments/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     try {
-        await query('DELETE FROM payments WHERE id = $1', [id]);
+        await query('DELETE FROM payments WHERE payment_id = $1', [id]);
         res.status(204).send();
     } catch (err) {
         console.error(err);
@@ -334,7 +334,7 @@ app.delete('/api/payments/:id', authenticateToken, async (req: AuthRequest, res:
 app.delete('/api/expenditures/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     try {
-        await query('DELETE FROM expenditures WHERE id = $1', [id]);
+        await query('DELETE FROM expenditures WHERE expenditure_id = $1', [id]);
         res.status(204).send();
     } catch (err) {
         console.error(err);
