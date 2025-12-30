@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { Student, StudentFormData, HowTheyHeardAboutUs, ServiceType } from '../types';
 import Modal from './shared/Modal';
+import { formatDateForInput } from '../utils/dateUtils';
 
 interface StudentEditFormProps {
   student: Student;
@@ -17,8 +17,8 @@ const StudentEditForm: React.FC<StudentEditFormProps> = ({ student, onSubmit, on
     email: student.email || '',
     phone: student.phone || '',
     languageOfStudy: student.languageOfStudy,
-    registrationDate: student.registrationDate,
-    dateOfBirth: student.dateOfBirth,
+    registrationDate: formatDateForInput(student.registrationDate),
+    dateOfBirth: formatDateForInput(student.dateOfBirth),
     nationality: student.nationality,
     occupation: student.occupation,
     address: student.address,
@@ -35,8 +35,8 @@ const StudentEditForm: React.FC<StudentEditFormProps> = ({ student, onSubmit, on
       email: student.email || '',
       phone: student.phone || '',
       languageOfStudy: student.languageOfStudy,
-      registrationDate: student.registrationDate,
-      dateOfBirth: student.dateOfBirth,
+      registrationDate: formatDateForInput(student.registrationDate),
+      dateOfBirth: formatDateForInput(student.dateOfBirth),
       nationality: student.nationality,
       occupation: student.occupation,
       address: student.address,

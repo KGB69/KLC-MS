@@ -8,6 +8,7 @@ import TranslationFields from './prospect/TranslationFields';
 import InterpretationFields from './prospect/InterpretationFields';
 import { useFormValidation } from '../hooks/useFormValidation';
 import { prospectFormSchema } from '../validation/prospectSchema';
+import { formatDateForInput, getTodayDate } from '../utils/dateUtils';
 
 interface ProspectFormProps {
     onSubmit: (prospect: ProspectFormData) => void;
@@ -23,7 +24,7 @@ const ProspectForm: React.FC<ProspectFormProps> = ({ onSubmit, initialData, onCa
         email: '',
         phone: '',
         contactMethod: ContactMethod.Phone,
-        dateOfContact: new Date().toISOString().split('T')[0],
+        dateOfContact: getTodayDate(),
         notes: '',
         serviceInterestedIn: ServiceType.LanguageTraining,
         trainingLanguages: [],
@@ -50,7 +51,7 @@ const ProspectForm: React.FC<ProspectFormProps> = ({ onSubmit, initialData, onCa
                 email: email || '',
                 phone: phone || '',
                 contactMethod,
-                dateOfContact,
+                dateOfContact: formatDateForInput(dateOfContact),
                 notes,
                 serviceInterestedIn,
                 trainingLanguages: [],
