@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { PaymentFormData, PaymentMethod, ServiceType, Client, Payment, Currency } from '../types';
-import { IndexedDBProspectDataStore } from '../services/indexedDBProspectStore';
+import { PaymentFormData, PaymentMethod, ServiceType, Client, Payment, Currency, ProspectDataStore } from '../types';
 import { formatCurrency, getDefaultCurrency, getCurrencySymbol, getAllCurrencies, getCurrencyName } from '../utils/currency';
 import { formatDateForInput, getTodayDate } from '../utils/dateUtils';
 import Modal from './shared/Modal';
@@ -11,10 +10,10 @@ interface PaymentFormProps {
   initialData?: Payment;
   isEditing?: boolean;
   clients: Client[];
+  dataStore: ProspectDataStore;
 }
 
-const PaymentForm: React.FC<PaymentFormProps> = ({ onSubmit, onCancel, initialData, isEditing = false, clients }) => {
-  const dataStore = useMemo(() => new IndexedDBProspectDataStore(), []);
+const PaymentForm: React.FC<PaymentFormProps> = ({ onSubmit, onCancel, initialData, isEditing = false, clients, dataStore }) => {
 
   const initialFormState: PaymentFormData = {
     payerName: '',

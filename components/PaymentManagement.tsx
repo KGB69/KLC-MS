@@ -154,13 +154,13 @@ const PaymentManagement: React.FC<PaymentManagementProps> = ({ dataStore }) => {
 
       {isFormVisible && (
         <div className="mb-8">
-          <PaymentForm onSubmit={handleAddPayment} onCancel={hideForm} clients={clients} />
+          <PaymentForm onSubmit={handleAddPayment} onCancel={hideForm} clients={clients} dataStore={dataStore} />
         </div>
       )}
 
       {editingPayment && (
         <div className="mb-8">
-          <PaymentForm onSubmit={handleUpdatePayment} onCancel={cancelEdit} initialData={editingPayment} isEditing={true} clients={clients} />
+          <PaymentForm onSubmit={handleUpdatePayment} onCancel={cancelEdit} initialData={editingPayment} isEditing={true} clients={clients} dataStore={dataStore} />
         </div>
       )}
 
