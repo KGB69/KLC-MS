@@ -1,5 +1,6 @@
 // Utility function to format dates for HTML date inputs
-export function formatDateForInput(date: string | Date | undefined | null): string {
+export function formatDateForInput(date: any): string {
+    // Handle null/undefined/empty
     if (!date) return '';
 
     try {
@@ -8,11 +9,21 @@ export function formatDateForInput(date: string | Date | undefined | null): stri
             return date;
         }
 
-        // Convert to Date object if it's a string
-        const dateObj = typeof date === 'string' ? new Date(date) : date;
+        // Convert to Date object
+        let dateObj: Date;
+        if (date instanceof Date) {
+            dateObj = date;
+        } else if (typeof date === 'string') {
+            dateObj = new Date(date);
+        } else if (typeof date === 'object' && date !== null) {
+            // Handle plain objects - they might have a toString or need conversion
+            dateObj = new Date(String(date));
+        } else {
+            return '';
+        }
 
-        // Check if valid date
-        if (!dateObj || isNaN(dateObj.getTime())) {
+        // Check if valid date (must check if getTime exists and is not NaN)
+        if (!dateObj || typeof dateObj.getTime !== 'function' || isNaN(dateObj.getTime())) {
             return '';
         }
 
@@ -23,7 +34,7 @@ export function formatDateForInput(date: string | Date | undefined | null): stri
 
         return `${year}-${month}-${day}`;
     } catch (error) {
-        console.error('Error formatting date:', error);
+        console.error('Error formatting date:', error, 'for value:', date);
         return '';
     }
 }
