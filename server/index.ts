@@ -318,6 +318,30 @@ app.post('/api/followups', authenticateToken, async (req: AuthRequest, res: Resp
     }
 });
 
+// --- DELETE Routes ---
+
+app.delete('/api/payments/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    try {
+        await query('DELETE FROM payments WHERE id = $1', [id]);
+        res.status(204).send();
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to delete payment' });
+    }
+});
+
+app.delete('/api/expenditures/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    try {
+        await query('DELETE FROM expenditures WHERE id = $1', [id]);
+        res.status(204).send();
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to delete expenditure' });
+    }
+});
+
 // --- Catch-all to serve React's index.html (SPA support) ---
 app.get(/^\/(?!api).*/, (req: Request, res: Response) => {
     res.sendFile(path.join(__dirname, '../../dist/index.html'));
