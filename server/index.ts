@@ -10,12 +10,26 @@ import { query } from './db.js';
 dotenv.config();
 
 const toCamel = (obj: any): any => {
-    if (obj === null || obj === undefined || typeof obj !== 'object') {
+    if (obj === null || obj === undefined) {
         return obj;
     }
+
+    // Handle Date objects - convert to YYYY-MM-DD format
+    if (obj instanceof Date) {
+        return obj.toISOString().split('T')[0];
+    }
+
+    // Handle arrays
     if (Array.isArray(obj)) {
         return obj.map(toCamel);
     }
+
+    // Handle non-object primitives
+    if (typeof obj !== 'object') {
+        return obj;
+    }
+
+    // Handle plain objects
     const n: any = {};
     Object.keys(obj).forEach(k => {
         const camelKey = k.replace(/(_\w)/g, (m: string) => m[1].toUpperCase());
