@@ -1,5 +1,6 @@
+```typescript
 // Utility function to format dates for HTML date inputs
-export function formatDateForInput(date: string | Date | undefined): string {
+export function formatDateForInput(date: string | Date | undefined | null): string {
     if (!date) return '';
 
     try {
@@ -12,7 +13,7 @@ export function formatDateForInput(date: string | Date | undefined): string {
         const dateObj = typeof date === 'string' ? new Date(date) : date;
 
         // Check if valid date
-        if (isNaN(dateObj.getTime())) {
+        if (!dateObj || isNaN(dateObj.getTime())) {
             return '';
         }
 
@@ -21,7 +22,7 @@ export function formatDateForInput(date: string | Date | undefined): string {
         const month = String(dateObj.getMonth() + 1).padStart(2, '0');
         const day = String(dateObj.getDate()).padStart(2, '0');
 
-        return `${year}-${month}-${day}`;
+        return `${ year } -${ month } -${ day } `;
     } catch (error) {
         console.error('Error formatting date:', error);
         return '';
@@ -32,3 +33,5 @@ export function formatDateForInput(date: string | Date | undefined): string {
 export function getTodayDate(): string {
     return new Date().toISOString().split('T')[0];
 }
+
+```
