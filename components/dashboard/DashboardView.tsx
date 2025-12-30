@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IndexedDBProspectDataStore } from '../../services/indexedDBProspectStore';
+import { ApiProspectDataStore } from '../../services/apiProspectStore';
 import MetricCards from './MetricCards';
 import ActivityFeed from './ActivityFeed';
 import UpcomingSchedule from './UpcomingSchedule';
@@ -9,7 +9,7 @@ import TasksWidget from './TasksWidget';
 type ActiveView = 'dashboard' | 'prospects' | 'clients' | 'classes' | 'conversions' | 'finance' | 'settings' | 'communications';
 
 interface DashboardViewProps {
-    prospectStore: IndexedDBProspectDataStore;
+    prospectStore: ApiProspectDataStore;
     onNavigate: (view: ActiveView) => void;
 }
 
