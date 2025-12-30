@@ -71,8 +71,8 @@ const StudentsTable: React.FC<StudentsTableProps> = ({
             render: (_: any, row: Student) => {
                 // Calculate total paid for this student
                 const studentPayments = payments.filter(p => p.clientId === row.id);
-                const totalPaid = studentPayments.reduce((sum, p) => sum + p.amount, 0);
-                const totalFees = row.fees;
+                const totalPaid = studentPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+                const totalFees = Number(row.fees) || 0;
                 const balance = totalFees - totalPaid;
                 const percentPaid = totalFees > 0 ? (totalPaid / totalFees) * 100 : 0;
 

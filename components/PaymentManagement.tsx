@@ -171,7 +171,7 @@ const PaymentManagement: React.FC<PaymentManagementProps> = ({ dataStore }) => {
           if (!acc[currency]) {
             acc[currency] = 0;
           }
-          acc[currency] += payment.amount;
+          acc[currency] += (Number(payment.amount) || 0);
           return acc;
         }, {} as Record<Currency, number>);
 

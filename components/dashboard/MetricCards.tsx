@@ -84,14 +84,14 @@ const MetricCards: React.FC<MetricCardProps> = ({ prospectStore }) => {
         const filtered = filterDataByTime(allPayments, 'paymentDate', receiptsTimeFilter, receiptsCustomRange) as Payment[];
 
         // Calculate total amount
-        const totalAmount = filtered.reduce((sum, payment) => sum + payment.amount, 0);
+        const totalAmount = filtered.reduce((sum, payment) => sum + (Number(payment.amount) || 0), 0);
 
         // Get currency (assume UGX for now, could be made dynamic)
         const currency = 'UGX';
 
         // Calculate previous period
         const previousPeriod = getPreviousPeriodData(allPayments, 'paymentDate', receiptsTimeFilter, receiptsCustomRange) as Payment[];
-        const previousAmount = previousPeriod.reduce((sum, payment) => sum + payment.amount, 0);
+        const previousAmount = previousPeriod.reduce((sum, payment) => sum + (Number(payment.amount) || 0), 0);
         const percentageChange = calculatePercentageChange(totalAmount, previousAmount);
 
         // Category breakdown - simplified since Payment type doesn't have purpose field
@@ -114,14 +114,14 @@ const MetricCards: React.FC<MetricCardProps> = ({ prospectStore }) => {
         const filtered = filterDataByTime(allExpenditures, 'expenditureDate', receiptsTimeFilter, receiptsCustomRange) as Expenditure[];
 
         // Calculate total amount
-        const totalAmount = filtered.reduce((sum, exp) => sum + exp.amount, 0);
+        const totalAmount = filtered.reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
 
         // Get currency
         const currency = 'UGX';
 
         // Calculate previous period
         const previousPeriod = getPreviousPeriodData(allExpenditures, 'expenditureDate', receiptsTimeFilter, receiptsCustomRange) as Expenditure[];
-        const previousAmount = previousPeriod.reduce((sum, exp) => sum + exp.amount, 0);
+        const previousAmount = previousPeriod.reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
         const percentageChange = calculatePercentageChange(totalAmount, previousAmount);
 
         // Category breakdown by expenditure category - show all categories
