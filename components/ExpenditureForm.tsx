@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ExpenditureFormData, ExpenditureCategory, PaymentMethod, Expenditure, Currency } from '../types';
 import { getDefaultCurrency, getCurrencySymbol, getAllCurrencies, getCurrencyName } from '../utils/currency';
+import { formatDateForInput, getTodayDate } from '../utils/dateUtils';
 import Modal from './shared/Modal';
 
 interface ExpenditureFormProps {
@@ -13,7 +14,7 @@ interface ExpenditureFormProps {
 const ExpenditureForm: React.FC<ExpenditureFormProps> = ({ onSubmit, onCancel, initialData, isEditing = false }) => {
   const initialFormState: ExpenditureFormData = {
     payeeName: '',
-    expenditureDate: new Date().toISOString().split('T')[0],
+    expenditureDate: getTodayDate(),
     amount: 0,
     currency: Currency.UGX, // Always default to UGX
     description: '',
@@ -27,7 +28,7 @@ const ExpenditureForm: React.FC<ExpenditureFormProps> = ({ onSubmit, onCancel, i
     if (isEditing && initialData) {
       setFormData({
         payeeName: initialData.payeeName,
-        expenditureDate: initialData.expenditureDate,
+        expenditureDate: formatDateForInput(initialData.expenditureDate),
         amount: initialData.amount,
         currency: initialData.currency,
         description: initialData.description,

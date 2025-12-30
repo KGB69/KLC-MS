@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { PaymentFormData, PaymentMethod, ServiceType, Client, Payment, Currency } from '../types';
 import { IndexedDBProspectDataStore } from '../services/indexedDBProspectStore';
 import { formatCurrency, getDefaultCurrency, getCurrencySymbol, getAllCurrencies, getCurrencyName } from '../utils/currency';
+import { formatDateForInput, getTodayDate } from '../utils/dateUtils';
 import Modal from './shared/Modal';
 
 interface PaymentFormProps {
@@ -18,7 +19,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ onSubmit, onCancel, initialDa
   const initialFormState: PaymentFormData = {
     payerName: '',
     clientId: '',
-    paymentDate: new Date().toISOString().split('T')[0],
+    paymentDate: getTodayDate(),
     amount: 0,
     currency: Currency.UGX, // Always default to UGX
     service: ServiceType.LanguageTraining,
@@ -35,7 +36,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ onSubmit, onCancel, initialDa
       setFormData({
         payerName: initialData.payerName,
         clientId: initialData.clientId,
-        paymentDate: initialData.paymentDate,
+        paymentDate: formatDateForInput(initialData.paymentDate),
         amount: initialData.amount,
         currency: initialData.currency,
         service: initialData.service,
