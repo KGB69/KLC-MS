@@ -41,6 +41,7 @@ async function initializeDatabase() {
         console.log('  - student_enrollments');
         console.log('  - payments');
         console.log('  - expenditures');
+        console.log('  - communications');
 
         client.release();
         await pool.end();
