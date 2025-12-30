@@ -52,7 +52,7 @@ export class ApiProspectDataStore {
     return response.json();
   }
 
-  async updateProspectStatus(id: string, status: string): Promise<Prospect | undefined> {
+  async updateProspectStatus(id: string, status: any): Promise<Prospect | undefined> {
     return this.updateProspect(id, { status });
   }
 
@@ -66,8 +66,6 @@ export class ApiProspectDataStore {
 
   async searchProspects(criteria: SearchCriteria): Promise<Prospect[]> {
     const params = new URLSearchParams();
-    if (criteria.status) params.append('status', criteria.status);
-    if (criteria.serviceType) params.append('serviceType', criteria.serviceType);
     if (criteria.searchTerm) params.append('searchTerm', criteria.searchTerm);
 
     const response = await fetch(`${API_BASE_URL}/prospects?${params}`, {
