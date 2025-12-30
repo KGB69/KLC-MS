@@ -293,6 +293,11 @@ export class ApiProspectDataStore {
     return response.ok;
   }
 
+  async getPaymentsForClient(clientId: string): Promise<Payment[]> {
+    const allPayments = await this.getAllPayments();
+    return allPayments.filter(p => p.clientId === clientId);
+  }
+
   // --- Expenditure Methods ---
 
   async addExpenditure(expenditureData: ExpenditureFormData): Promise<Expenditure> {
