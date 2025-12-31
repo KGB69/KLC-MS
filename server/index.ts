@@ -251,6 +251,59 @@ app.post('/api/classes', authenticateToken, async (req: AuthRequest, res: Respon
     }
 });
 
+// --- Student Routes ---
+
+app.get('/api/students', authenticateToken, async (req: AuthRequest, res: Response) => {
+    try {
+        const result = await query(`
+            SELECT s.*, u1.username as created_by_username, u2.username as modified_by_username 
+            FROM students s
+            LEFT JOIN users u1 ON s.created_by = u1.id
+            LEFT JOIN users u2 ON s.modified_by = u2.id
+            ORDER BY s.name ASC
+        `);
+        res.json(toCamel(result.rows));
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to fetch students' });
+    }
+});
+
+app.post('/api/students', authenticateToken, async (req: AuthRequest, res: Response) => {
+    const { name, email, phone, registrationDate, dateOfBirth, nationality, occupation, address, motherTongue, howTheyHeardAboutUs, howTheyHeardAboutUsOther, fees, languageOfStudy } = req.body;
+    const studentId = `STU-${new Date().toISOString().slice(2, 10).replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`;
+    try {
+        const result = await query(
+            `INSERT INTO students (student_id, name, email, phone, registration_date, date_of_birth, nationality, occupation, address, mother_tongue, how_heard_about_us, how_heard_about_us_other, fees, language_of_study, created_by) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *`,
+            [studentId, name, email, phone, registrationDate, dateOfBirth, nationality, occupation, address, motherTongue, howTheyHeardAboutUs, howTheyHeardAboutUsOther, fees, languageOfStudy, req.user.id]
+        );
+        res.status(201).json(toCamel(result.rows[0]));
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to add student' });
+    }
+});
+
+app.put('/api/students/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    const { name, email, phone, registrationDate, dateOfBirth, nationality, occupation, address, motherTongue, howTheyHeardAboutUs, howTheyHeardAboutUsOther, fees, languageOfStudy } = req.body;
+    try {
+        const result = await query(
+            `UPDATE students SET name = $1, email = $2, phone = $3, registration_date = $4, date_of_birth = $5, nationality = $6, occupation = $7, address = $8, mother_tongue = $9, how_heard_about_us = $10, how_heard_about_us_other = $11, fees = $12, language_of_study = $13, modified_by = $14, modified_at = CURRENT_TIMESTAMP
+             WHERE id = $15 RETURNING *`,
+            [name, email, phone, registrationDate, dateOfBirth, nationality, occupation, address, motherTongue, howTheyHeardAboutUs, howTheyHeardAboutUsOther, fees, languageOfStudy, req.user.id, id]
+        );
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Student not found' });
+        }
+        res.json(toCamel(result.rows[0]));
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to update student' });
+    }
+});
+
 // --- Finance Routes ---
 
 app.get('/api/payments', authenticateToken, async (req: AuthRequest, res: Response) => {
