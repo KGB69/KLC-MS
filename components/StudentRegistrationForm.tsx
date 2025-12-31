@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Prospect, StudentDetailsFormData, HowTheyHeardAboutUs } from '../types';
+import { Prospect, StudentDetailsFormData, howHeardAboutUs } from '../types';
 import Modal from './shared/Modal';
 
 interface StudentRegistrationFormProps {
@@ -18,8 +18,8 @@ const StudentRegistrationForm: React.FC<StudentRegistrationFormProps> = ({ prosp
     occupation: '',
     address: '',
     motherTongue: '',
-    howTheyHeardAboutUs: HowTheyHeardAboutUs.GoogleSearch,
-    howTheyHeardAboutUsOther: '',
+    howHeardAboutUs: howHeardAboutUs.GoogleSearch,
+    howHeardAboutUsOther: '',
     fees: 0,
   };
 
@@ -41,14 +41,14 @@ const StudentRegistrationForm: React.FC<StudentRegistrationFormProps> = ({ prosp
       alert("Please fill in all required fields.");
       return;
     }
-    if (formData.howTheyHeardAboutUs === HowTheyHeardAboutUs.Other && !formData.howTheyHeardAboutUsOther?.trim()) {
+    if (formData.howHeardAboutUs === howHeardAboutUs.Other && !formData.howHeardAboutUsOther?.trim()) {
       alert("Please specify the source for 'Other'.");
       return;
     }
 
     const submissionData = { ...formData };
-    if (formData.howTheyHeardAboutUs !== HowTheyHeardAboutUs.Other) {
-      submissionData.howTheyHeardAboutUsOther = '';
+    if (formData.howHeardAboutUs !== howHeardAboutUs.Other) {
+      submissionData.howHeardAboutUsOther = '';
     }
 
     onSubmit(submissionData);
@@ -168,27 +168,27 @@ const StudentRegistrationForm: React.FC<StudentRegistrationFormProps> = ({ prosp
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="howTheyHeardAboutUs" className="block text-sm font-medium text-slate-600 mb-1">How did they hear about us?</label>
+            <label htmlFor="howHeardAboutUs" className="block text-sm font-medium text-slate-600 mb-1">How did they hear about us?</label>
             <select
-              id="howTheyHeardAboutUs"
-              name="howTheyHeardAboutUs"
-              value={formData.howTheyHeardAboutUs}
+              id="howHeardAboutUs"
+              name="howHeardAboutUs"
+              value={formData.howHeardAboutUs}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-primary focus:border-brand-primary bg-white"
             >
-              {Object.values(HowTheyHeardAboutUs).map(source => (
+              {Object.values(howHeardAboutUs).map(source => (
                 <option key={source} value={source}>{source}</option>
               ))}
             </select>
           </div>
-          {formData.howTheyHeardAboutUs === HowTheyHeardAboutUs.Other && (
+          {formData.howHeardAboutUs === howHeardAboutUs.Other && (
             <div className="animate-fade-in">
-              <label htmlFor="howTheyHeardAboutUsOther" className="block text-sm font-medium text-slate-600 mb-1">Please Specify</label>
+              <label htmlFor="howHeardAboutUsOther" className="block text-sm font-medium text-slate-600 mb-1">Please Specify</label>
               <input
                 type="text"
-                id="howTheyHeardAboutUsOther"
-                name="howTheyHeardAboutUsOther"
-                value={formData.howTheyHeardAboutUsOther || ''}
+                id="howHeardAboutUsOther"
+                name="howHeardAboutUsOther"
+                value={formData.howHeardAboutUsOther || ''}
                 onChange={handleChange}
                 placeholder="e.g., University fair"
                 className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-primary focus:border-brand-primary"

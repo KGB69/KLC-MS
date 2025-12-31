@@ -81,7 +81,7 @@ export enum ProspectStatus {
   Converted = 'Converted',
 }
 
-export enum HowTheyHeardAboutUs {
+export enum howHeardAboutUs {
   FamilyFriend = 'Family/Friend',
   SignPost = 'Sign Post',
   GoogleSearch = 'Google Search',
@@ -206,8 +206,8 @@ export interface Student {
   occupation: string;
   address: string;
   motherTongue: string;
-  howTheyHeardAboutUs: HowTheyHeardAboutUs;
-  howTheyHeardAboutUsOther?: string;
+  howHeardAboutUs: howHeardAboutUs;
+  howHeardAboutUsOther?: string;
   fees: number;
   languageOfStudy?: string; // Language the student is learning
   serviceInterestedIn?: ServiceType; // For converted prospect clients
@@ -318,8 +318,8 @@ export interface StudentFormData {
   occupation: string;
   address: string;
   motherTongue: string;
-  howTheyHeardAboutUs: HowTheyHeardAboutUs;
-  howTheyHeardAboutUsOther?: string;
+  howHeardAboutUs: howHeardAboutUs;
+  howHeardAboutUsOther?: string;
   fees: number;
 }
 
@@ -332,8 +332,8 @@ export interface StudentDetailsFormData {
   occupation: string;
   address: string;
   motherTongue: string;
-  howTheyHeardAboutUs: HowTheyHeardAboutUs;
-  howTheyHeardAboutUsOther?: string;
+  howHeardAboutUs: howHeardAboutUs;
+  howHeardAboutUsOther?: string;
   fees: number;
 }
 

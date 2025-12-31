@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Student, StudentFormData, HowTheyHeardAboutUs, ServiceType } from '../types';
+import { Student, StudentFormData, howHeardAboutUs, ServiceType } from '../types';
 import Modal from './shared/Modal';
 import { formatDateForInput } from '../utils/dateUtils';
 
@@ -23,8 +23,8 @@ const StudentEditForm: React.FC<StudentEditFormProps> = ({ student, onSubmit, on
     occupation: student.occupation,
     address: student.address,
     motherTongue: student.motherTongue || '',
-    howTheyHeardAboutUs: student.howTheyHeardAboutUs,
-    howTheyHeardAboutUsOther: student.howTheyHeardAboutUsOther || '',
+    howHeardAboutUs: student.howHeardAboutUs,
+    howHeardAboutUsOther: student.howHeardAboutUsOther || '',
     fees: student.fees || 0,
   });
 
@@ -41,8 +41,8 @@ const StudentEditForm: React.FC<StudentEditFormProps> = ({ student, onSubmit, on
       occupation: student.occupation,
       address: student.address,
       motherTongue: student.motherTongue || '',
-      howTheyHeardAboutUs: student.howTheyHeardAboutUs,
-      howTheyHeardAboutUsOther: student.howTheyHeardAboutUsOther || '',
+      howHeardAboutUs: student.howHeardAboutUs,
+      howHeardAboutUsOther: student.howHeardAboutUsOther || '',
       fees: student.fees || 0,
     });
   }, [student]);
@@ -64,14 +64,14 @@ const StudentEditForm: React.FC<StudentEditFormProps> = ({ student, onSubmit, on
       alert("Please fill in all required fields.");
       return;
     }
-    if (formData.howTheyHeardAboutUs === HowTheyHeardAboutUs.Other && !formData.howTheyHeardAboutUsOther?.trim()) {
+    if (formData.howHeardAboutUs === howHeardAboutUs.Other && !formData.howHeardAboutUsOther?.trim()) {
       alert("Please specify the source for 'Other'.");
       return;
     }
 
     const submissionData = { ...formData };
-    if (formData.howTheyHeardAboutUs !== HowTheyHeardAboutUs.Other) {
-      submissionData.howTheyHeardAboutUsOther = '';
+    if (formData.howHeardAboutUs !== howHeardAboutUs.Other) {
+      submissionData.howHeardAboutUsOther = '';
     }
 
     onSubmit(submissionData);

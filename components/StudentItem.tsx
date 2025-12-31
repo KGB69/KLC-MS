@@ -70,8 +70,8 @@ const StudentItem: React.FC<StudentItemProps> = ({ student, onEdit, onEnroll }) 
                 <div className="mt-4">
                     <p className="text-xs text-gray-500 font-medium">How They Heard About Us</p>
                     <p className="text-sm text-dark">
-                        {student.howTheyHeardAboutUs}
-                        {student.howTheyHeardAboutUsOther && ` (${student.howTheyHeardAboutUsOther})`}
+                        {student.howHeardAboutUs}
+                        {student.howHeardAboutUsOther && ` (${student.howHeardAboutUsOther})`}
                     </p>
                 </div>
             </div>

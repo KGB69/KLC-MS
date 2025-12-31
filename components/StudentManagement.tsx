@@ -45,8 +45,8 @@ const StudentManagement: React.FC<StudentManagementProps> = ({ dataStore, onEdit
         occupation: '',
         address: '',
         motherTongue: '',
-        howTheyHeardAboutUs: (job as any).howTheyHeardAboutUs || (job as any).howHeardAboutUs,
-        howTheyHeardAboutUsOther: (job as any).howTheyHeardAboutUsOther || (job as any).howHeardAboutUsOther,
+        howHeardAboutUs: (job as any).howHeardAboutUs || (job as any).howHeardAboutUs,
+        howHeardAboutUsOther: (job as any).howHeardAboutUsOther || (job as any).howHeardAboutUsOther,
         fees: job.translationTotalFee || job.interpretationTotalFee || 0,
         serviceInterestedIn: job.serviceInterestedIn, // Preserve service type
         createdBy: job.createdBy,

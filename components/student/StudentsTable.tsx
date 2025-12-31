@@ -173,9 +173,9 @@ const StudentsTable: React.FC<StudentsTableProps> = ({
                         <div>
                             <h4 className="font-semibold text-sm text-slate-700 mb-2">Additional Information</h4>
                             <div className="space-y-1 text-xs text-slate-600">
-                                <div><span className="font-medium">How They Heard:</span> {student.howTheyHeardAboutUs || 'Not specified'}</div>
-                                {student.howTheyHeardAboutUsOther && (
-                                    <div><span className="font-medium">Details:</span> {student.howTheyHeardAboutUsOther}</div>
+                                <div><span className="font-medium">How They Heard:</span> {student.howHeardAboutUs || 'Not specified'}</div>
+                                {student.howHeardAboutUsOther && (
+                                    <div><span className="font-medium">Details:</span> {student.howHeardAboutUsOther}</div>
                                 )}
                             </div>
                         </div>
@@ -205,9 +205,9 @@ const StudentsTable: React.FC<StudentsTableProps> = ({
                         <div>
                             <h4 className="font-semibold text-sm text-slate-700 mb-2">Additional Information</h4>
                             <div className="space-y-1 text-xs text-slate-600">
-                                <div><span className="font-medium">How They Heard:</span> {student.howTheyHeardAboutUs || 'N/A'}</div>
-                                {student.howTheyHeardAboutUsOther && (
-                                    <div><span className="font-medium">Details:</span> {student.howTheyHeardAboutUsOther}</div>
+                                <div><span className="font-medium">How They Heard:</span> {student.howHeardAboutUs || 'N/A'}</div>
+                                {student.howHeardAboutUsOther && (
+                                    <div><span className="font-medium">Details:</span> {student.howHeardAboutUsOther}</div>
                                 )}
                             </div>
                         </div>
