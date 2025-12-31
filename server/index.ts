@@ -285,6 +285,7 @@ app.get('/api/students', authenticateToken, async (req: AuthRequest, res: Respon
 
 app.post('/api/students', authenticateToken, async (req: AuthRequest, res: Response) => {
     const { name, email, phone, registrationDate, dateOfBirth, nationality, occupation, address, motherTongue, howTheyHeardAboutUs, howTheyHeardAboutUsOther, fees, languageOfStudy } = req.body;
+    console.log('📝 Creating student with data:', { name, howTheyHeardAboutUs, languageOfStudy }); // Debug log
     const studentId = `STU-${new Date().toISOString().slice(2, 10).replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`;
     try {
         const result = await query(
