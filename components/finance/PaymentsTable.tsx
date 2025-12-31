@@ -49,17 +49,6 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({ payments, onEdit, onDelet
             width: '12%',
         },
         {
-            header: 'Balance',
-            accessor: 'balance' as keyof Payment,
-            render: (_: any, row: Payment) => (
-                <span className={`font-semibold ${(row.balance || 0) > 0 ? 'text-orange-600' : 'text-slate-400'}`}>
-                    {formatCurrency(row.balance || 0, row.balanceCurrency || row.currency)}
-                </span>
-            ),
-            sortable: true,
-            width: '12%',
-        },
-        {
             header: 'Method',
             accessor: 'paymentMethod' as keyof Payment,
             width: '12%',
