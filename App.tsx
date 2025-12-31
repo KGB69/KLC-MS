@@ -310,11 +310,20 @@ const App: React.FC = () => {
       // Edit as student - opens StudentEditForm
       setEditingStudent(student);
     } else {
-      // Clients (C-*) are from completed jobs and are read-only
-      // Show an info message - all their info is visible in the expanded row
-      alert("Client records from completed jobs are view-only. You can see all details by clicking the expand arrow (▶) on the row.");
+      // This is a converted prospect client - fetch the prospect data and edit as prospect
+      try {
+        const prospect = await prospectStore.getProspectById(student.id);
+        if (prospect) {
+          setEditingProspect(prospect);
+        } else {
+          setError("Could not find prospect data for this client. The client may have been deleted.");
+        }
+      } catch (err) {
+        console.error("Failed to fetch client for editing:", err);
+        setError("Could not load client data for editing.");
+      }
     }
-  }, []);
+  }, [prospectStore]);
 
   const handleUpdateStudent = useCallback(async (updatedData: StudentFormData) => {
     if (!editingStudent) return;

@@ -150,6 +150,20 @@ app.post('/api/prospects', authenticateToken, async (req: AuthRequest, res: Resp
     }
 });
 
+app.get('/api/prospects/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    try {
+        const result = await query('SELECT * FROM prospects WHERE id = $1', [id]);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Prospect not found' });
+        }
+        res.json(toCamel(result.rows[0]));
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to fetch prospect' });
+    }
+});
+
 app.put('/api/prospects/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const updates = req.body;
