@@ -40,6 +40,10 @@ export class ApiProspectDataStore {
     return response.json();
   }
 
+  async getProspectById(id: string): Promise<Prospect | undefined> {
+    return this.getProspect(id);
+  }
+
   async updateProspect(id: string, updates: Partial<Prospect>): Promise<Prospect | undefined> {
     const response = await fetch(`${API_BASE_URL}/prospects/${id}`, {
       method: 'PUT',
