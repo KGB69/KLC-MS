@@ -190,7 +190,7 @@ const MetricCards: React.FC<MetricCardProps> = ({ prospectStore }) => {
     return (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
             <h2 className="text-lg font-bold text-slate-800 mb-4">Dashboard Metrics</h2>
-            <div className="grid grid-cols-3 gap-4 divide-x divide-slate-200">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:divide-x divide-slate-200">
                 {/* Prospects Gauge */}
                 <GaugeChart
                     title="Prospects"

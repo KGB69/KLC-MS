@@ -1146,6 +1146,15 @@ a:hover {
     overflow: scroll;
 }
 
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
 .cursor-pointer {
     cursor: pointer;
 }
@@ -1171,53 +1180,78 @@ a:hover {
     html {
         font-size: 14px;
     }
-    
-    h1 { font-size: 1.5rem; }
-    h2 { font-size: 1.25rem; }
-    h3 { font-size: 1.1rem; }
-    
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.25rem;
+    }
+
+    h3 {
+        font-size: 1.1rem;
+    }
+
     .grid-cols-2,
     .grid-cols-3,
     .grid-cols-4 {
         grid-template-columns: 1fr !important;
     }
-    
+
     /* Metric cards stack vertically */
     .metric-card {
         padding: 0.75rem;
     }
-    
+
     /* Smaller padding */
-    .px-4 { padding-left: 0.5rem; padding-right: 0.5rem; }
-    .px-6 { padding-left: 0.75rem; padding-right: 0.75rem; }
-    .py-4 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-    .p-4 { padding: 0.5rem; }
-    .p-6 { padding: 0.75rem; }
-    
+    .px-4 {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .px-6 {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
+    .py-4 {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .p-4 {
+        padding: 0.5rem;
+    }
+
+    .p-6 {
+        padding: 0.75rem;
+    }
+
     /* Forms - single column and full width */
     .form-grid,
     .md\\:grid-cols-2,
     .lg\\:grid-cols-3 {
         grid-template-columns: 1fr !important;
     }
-    
+
     /* Buttons - full width on ultra-small */
     .btn-group {
         flex-direction: column;
         gap: 0.5rem;
     }
-    
-    .btn-group > button {
+
+    .btn-group>button {
         width: 100%;
     }
-    
+
     /* Table cell padding reduction */
     table td,
     table th {
         padding: 0.5rem 0.25rem !important;
         font-size: 0.75rem;
     }
-    
+
     /* Hide less important columns */
     .hide-on-xs {
         display: none !important;
@@ -1226,6 +1260,7 @@ a:hover {
 
 /* Small screens (401px - 640px) */
 @media (max-width: 640px) {
+
     .grid-cols-2,
     .grid-cols-3,
     .grid-cols-4 {
@@ -1240,20 +1275,21 @@ a:hover {
     .nav {
         flex-wrap: wrap;
     }
-    
+
     /* Forms - single column */
     .md\\:grid-cols-2 {
         grid-template-columns: 1fr;
     }
-    
+
     /* Mobile-friendly spacing */
-    .space-x-4 > * + * {
+    .space-x-4>*+* {
         margin-left: 0.5rem;
     }
 }
 
 /* Medium screens (641px - 1024px) */
 @media (min-width: 641px) and (max-width: 1024px) {
+
     .grid-cols-3,
     .grid-cols-4 {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1265,23 +1301,23 @@ a:hover {
     .mobile-stack {
         flex-direction: column !important;
     }
-    
+
     .mobile-full-width {
         width: 100% !important;
     }
-    
+
     .mobile-text-sm {
         font-size: 0.875rem !important;
     }
-    
+
     .mobile-text-xs {
         font-size: 0.75rem !important;
     }
-    
+
     .mobile-hidden {
         display: none !important;
     }
-    
+
     .mobile-p-2 {
         padding: 0.5rem !important;
     }

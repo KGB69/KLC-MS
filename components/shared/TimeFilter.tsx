@@ -34,42 +34,44 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ currentFilter, onFilterChange, 
 
     return (
         <>
-            <div className="flex items-center space-x-1 bg-slate-100 rounded-lg p-1">
-                {filterOptions.map((option) => (
-                    <button
-                        key={option.value}
-                        onClick={() => onFilterChange(option.value)}
-                        className={`
+            <div className="overflow-x-auto scrollbar-hide -mx-1 px-1">
+                <div className="flex items-center space-x-1 bg-slate-100 rounded-lg p-1 min-w-max">
+                    {filterOptions.map((option) => (
+                        <button
+                            key={option.value}
+                            onClick={() => onFilterChange(option.value)}
+                            className={`
                             px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200
                             ${currentFilter === option.value
+                                    ? 'bg-white text-brand-primary shadow-sm'
+                                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                                }
+                        `}
+                        >
+                            {option.label}
+                        </button>
+                    ))}
+
+                    {/* Calendar Icon Button */}
+                    <button
+                        onClick={() => setShowDatePicker(true)}
+                        className={`
+                        px-3 py-1.5 rounded-md transition-all duration-200 flex items-center space-x-1
+                        ${currentFilter === 'custom'
                                 ? 'bg-white text-brand-primary shadow-sm'
                                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                             }
-                        `}
-                    >
-                        {option.label}
-                    </button>
-                ))}
-
-                {/* Calendar Icon Button */}
-                <button
-                    onClick={() => setShowDatePicker(true)}
-                    className={`
-                        px-3 py-1.5 rounded-md transition-all duration-200 flex items-center space-x-1
-                        ${currentFilter === 'custom'
-                            ? 'bg-white text-brand-primary shadow-sm'
-                            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                        }
                     `}
-                    title="Custom date range"
-                >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    {currentFilter === 'custom' && customRange && (
-                        <span className="text-xs font-medium ml-1">{formatCustomRange()}</span>
-                    )}
-                </button>
+                        title="Custom date range"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        {currentFilter === 'custom' && customRange && (
+                            <span className="text-xs font-medium ml-1">{formatCustomRange()}</span>
+                        )}
+                    </button>
+                </div>
             </div>
 
             {showDatePicker && (

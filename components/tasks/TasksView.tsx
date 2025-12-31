@@ -194,35 +194,38 @@ const CommunicationsView: React.FC<CommunicationsViewProps> = ({ prospectStore }
     }
 
     return (
-        <div className="p-6 animate-fade-in">
-            <div className="flex justify-between items-center mb-6">
+        <div className="p-4 sm:p-6 animate-fade-in">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-brand-dark">Communications</h1>
-                    <p className="text-slate-600">Manage all your communications and follow-ups here.</p>
+                    <h1 className="text-xl sm:text-2xl font-bold text-brand-dark">Communications</h1>
+                    <p className="text-sm sm:text-base text-slate-600">Manage all your communications and follow-ups here.</p>
                 </div>
                 <button
                     onClick={() => setIsFormOpen(true)}
-                    className="flex items-center justify-center bg-brand-primary text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-all duration-200"
+                    className="flex items-center justify-center bg-brand-primary text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-all duration-200 whitespace-nowrap text-sm sm:text-base"
                 >
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
-                    New Communication
+                    <span className="hidden sm:inline">New Communication</span>
+                    <span className="sm:hidden ml-2">New</span>
                 </button>
             </div>
 
             {/* Filters */}
-            <div className="flex space-x-2 bg-white p-1 rounded-lg border border-slate-200 shadow-sm mb-6">
-                {(['all', 'prospect', 'general', 'pending', 'completed'] as FilterType[]).map((f) => (
-                    <button
-                        key={f}
-                        onClick={() => setFilter(f)}
-                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${filter === f ? 'bg-brand-primary text-white shadow-sm' : 'text-slate-600 hover:bg-slate-50'
-                            }`}
-                    >
-                        {f === 'prospect' ? 'Prospect-Related' : f.charAt(0).toUpperCase() + f.slice(1)}
-                    </button>
-                ))}
+            <div className="overflow-x-auto scrollbar-hide -mx-1 px-1 mb-6">
+                <div className="flex space-x-2 bg-white p-1 rounded-lg border border-slate-200 shadow-sm min-w-max">
+                    {(['all', 'prospect', 'general', 'pending', 'completed'] as FilterType[]).map((f) => (
+                        <button
+                            key={f}
+                            onClick={() => setFilter(f)}
+                            className={`px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${filter === f ? 'bg-brand-primary text-white shadow-sm' : 'text-slate-600 hover:bg-slate-50'
+                                }`}
+                        >
+                            {f === 'prospect' ? 'Prospect-Related' : f.charAt(0).toUpperCase() + f.slice(1)}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {/* Time Filter */}
