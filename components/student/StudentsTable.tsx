@@ -70,8 +70,8 @@ const StudentsTable: React.FC<StudentsTableProps> = ({
             accessor: 'serviceInterestedIn' as keyof Student,
             render: (value: string) => value ? (
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${value === 'Language Training' ? 'bg-blue-100 text-blue-800' :
-                        value === 'Document Translation' ? 'bg-green-100 text-green-800' :
-                            'bg-purple-100 text-purple-800'
+                    value === 'Document Translation' ? 'bg-green-100 text-green-800' :
+                        'bg-purple-100 text-purple-800'
                     }`}>
                     {value}
                 </span>
@@ -195,11 +195,14 @@ const StudentsTable: React.FC<StudentsTableProps> = ({
             keyExtractor={(row) => row.id}
             renderExpandedRow={renderExpandedRow}
             actions={(row) => {
-                // Check if this is a student (S-XXX) or other client (C-XXX)
-                const isStudent = row.studentId.startsWith('S-');
+                // Check if this is a student (STU-XXX) or converted prospect client (C-XXX)
+                const isStudent = row.studentId.startsWith('STU-');
 
-                const actionList = [
-                    {
+                // Only students can be edited (converted prospects are read-only)
+                const actionList = [];
+
+                if (isStudent) {
+                    actionList.push({
                         label: 'Edit',
                         onClick: () => onEdit(row),
                         icon: (
@@ -207,11 +210,7 @@ const StudentsTable: React.FC<StudentsTableProps> = ({
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
                         ),
-                    },
-                ];
-
-                // Add student-specific action
-                if (isStudent) {
+                    });
                     actionList.push({
                         label: 'Enroll in Class',
                         onClick: () => onEnroll(row),
@@ -221,24 +220,9 @@ const StudentsTable: React.FC<StudentsTableProps> = ({
                             </svg>
                         ),
                     });
-                } else {
-                    // Add non-student client actions
-                    actionList.push({
-                        label: 'View Details',
-                        onClick: () => {
-                            // This could navigate to a detailed view or open a modal
-                            console.log('View client details:', row);
-                        },
-                        icon: (
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                        ),
-                    });
                 }
 
-                return <TableActionMenu actions={actionList} />;
+                return actionList.length > 0 ? <TableActionMenu actions={actionList} /> : null;
             }}
             emptyMessage="No students found."
             defaultSortColumn="Registration Date"
