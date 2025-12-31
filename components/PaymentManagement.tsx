@@ -129,7 +129,19 @@ const PaymentManagement: React.FC<PaymentManagementProps> = ({ dataStore }) => {
 
   return (
     <div className="animate-fade-in">
-      <div className="flex justify-between items-center mb-8">
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <h2 className="text-2xl font-bold text-brand-dark mb-2">Payment Management</h2>
+            <p className="text-brand-secondary">Record and track all incoming payments from clients and students.</p>
+          </div>
+          <button
+            onClick={showForm}
+            className="flex items-center justify-center bg-brand-primary text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-sky-700"
+          >
+            New Payment
+          </button>
+        </div>
         <div className="flex-1 max-w-md">
           <TimeFilter
             currentFilter={timeFilter}
@@ -140,16 +152,6 @@ const PaymentManagement: React.FC<PaymentManagementProps> = ({ dataStore }) => {
             customRange={customDateRange}
           />
         </div>
-        <button
-          onClick={showForm}
-          className="flex items-center justify-center bg-brand-primary text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-all duration-200"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
-            <path fillRule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm3 0a1 1 0 011-1h1a1 1 0 110 2H8a1 1 0 01-1-1z" clipRule="evenodd" />
-          </svg>
-          New Payment
-        </button>
       </div>
 
       {isFormVisible && (
