@@ -48,8 +48,27 @@ const JWT_SECRET = process.env.JWT_SECRET || 'klc-ms-secret-key-change-me';
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from the React app build
-app.use(express.static(path.join(__dirname, '../../dist')));
+// Serve static files with cache busting headers
+// JavaScript and CSS files have content hashes in their filenames, so they can be cached long-term
+app.use(express.static(path.join(__dirname, '../../dist'), {
+    maxAge: '1y',  // Cache hashed assets for 1 year
+    setHeaders: (res: express.Response, filePath: string) => {
+        // HTML files should never be cached - always fetch fresh
+        if (filePath.endsWith('.html')) {
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.setHeader('Pragma', 'no-cache');
+            res.setHeader('Expires', '0');
+        }
+        // Service worker should also not be cached
+        else if (filePath.includes('sw.js') || filePath.includes('workbox')) {
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        }
+        // Manifest should be short-term cached
+        else if (filePath.endsWith('.json')) {
+            res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 hour
+        }
+    }
+}));
 
 // --- Authentication Middleware ---
 interface AuthRequest extends Request {

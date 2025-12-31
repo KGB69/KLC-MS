@@ -45,6 +45,8 @@ export default defineConfig(({ mode }) => {
           ]
         },
         workbox: {
+          skipWaiting: true,  // Immediately activate new service worker
+          clientsClaim: true, // Take control of all clients immediately
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
           runtimeCaching: [
             {
@@ -94,6 +96,10 @@ export default defineConfig(({ mode }) => {
       minify: 'terser',
       rollupOptions: {
         output: {
+          // Add content hashes to all output files for cache busting
+          entryFileNames: 'assets/[name]-[hash].js',
+          chunkFileNames: 'assets/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash].[ext]',
           manualChunks: {
             'react-vendor': ['react', 'react-dom'],
             'echarts-vendor': ['echarts', 'echarts-for-react']
