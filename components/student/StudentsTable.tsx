@@ -153,6 +153,7 @@ const StudentsTable: React.FC<StudentsTableProps> = ({
                         <div>
                             <h4 className="font-semibold text-sm text-slate-700 mb-2">Personal Information</h4>
                             <div className="space-y-1 text-xs text-slate-600">
+                                <div><span className="font-medium">Language of Study:</span> <span className="text-blue-700 font-semibold">{student.languageOfStudy || 'Not specified'}</span></div>
                                 <div><span className="font-medium">Date of Birth:</span> {student.dateOfBirth}</div>
                                 <div><span className="font-medium">Nationality:</span> {student.nationality}</div>
                                 <div><span className="font-medium">Occupation:</span> {student.occupation}</div>
