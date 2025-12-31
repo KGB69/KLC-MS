@@ -82,6 +82,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem(AUTH_TOKEN_KEY);
     };
 
+    const refreshToken = async () => {
+        try {
+            const token = localStorage.getItem(AUTH_TOKEN_KEY);
+            if (!token) return;
+
+            const response = await fetch('/api/auth/refresh', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                logout();
+                return;
+            }
+
+            const { token: newToken } = await response.json();
+            localStorage.setItem(AUTH_TOKEN_KEY, newToken);
+        } catch (error) {
+            console.error('Token refresh failed:', error);
+            logout();
+        }
+    };
+
+    // Auto-refresh token every 23 hours (before 24h expiration)
+    useEffect(() => {
+        if (!user) return;
+
+        const interval = setInterval(() => {
+            refreshToken();
+        }, 23 * 60 * 60 * 1000); // 23 hours
+
+        return () => clearInterval(interval);
+    }, [user]);
+
     const value: AuthContextType = {
         user,
         login,
