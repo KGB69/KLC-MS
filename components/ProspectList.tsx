@@ -66,9 +66,12 @@ const ProspectList: React.FC<ProspectListProps> = ({
     };
   }, [prospectStore, prospects]);
 
+  // Filter out converted prospects - they should only appear in Client Management
+  const activeProspects = prospects.filter(p => p.status !== 'Converted');
+
   return (
     <ProspectsTable
-      prospects={prospects}
+      prospects={activeProspects}
       taskIndicators={taskIndicators}
       onEdit={onEdit}
       onDelete={onDelete}

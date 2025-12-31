@@ -63,6 +63,20 @@ const StudentsTable: React.FC<StudentsTableProps> = ({
             accessor: 'registrationDate' as keyof Student,
             render: (value: string) => new Date(value).toLocaleDateString(),
             sortable: true,
+            width: '12%',
+        },
+        {
+            header: 'Service',
+            accessor: 'serviceInterestedIn' as keyof Student,
+            render: (value: string) => value ? (
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${value === 'Language Training' ? 'bg-blue-100 text-blue-800' :
+                        value === 'Document Translation' ? 'bg-green-100 text-green-800' :
+                            'bg-purple-100 text-purple-800'
+                    }`}>
+                    {value}
+                </span>
+            ) : <span className="text-slate-400 text-xs">Language Training</span>,
+            sortable: true,
             width: '15%',
         },
         {

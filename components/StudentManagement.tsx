@@ -39,7 +39,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({ dataStore, onEdit
         name: job.prospectName,
         email: job.email,
         phone: job.phone,
-        registrationDate: job.createdAt.split('T')[0], // Use createdAt as fallback for registration date
+        registrationDate: job.createdAt.split('T')[0],
         dateOfBirth: '',
         nationality: '',
         occupation: '',
@@ -48,6 +48,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({ dataStore, onEdit
         howTheyHeardAboutUs: (job as any).howTheyHeardAboutUs || (job as any).howHeardAboutUs,
         howTheyHeardAboutUsOther: (job as any).howTheyHeardAboutUsOther || (job as any).howHeardAboutUsOther,
         fees: job.translationTotalFee || job.interpretationTotalFee || 0,
+        serviceInterestedIn: job.serviceInterestedIn, // Preserve service type
         createdBy: job.createdBy,
         createdByUsername: job.createdByUsername,
         modifiedBy: job.modifiedBy,
