@@ -303,8 +303,8 @@ const App: React.FC = () => {
   }, []);
 
   const handleStartEditStudent = useCallback(async (student: Student) => {
-    // Check if this is a real student (S-XXX) or a converted prospect (C-XXX)
-    const isRealStudent = student.studentId.startsWith('S-');
+    // Check if this is a real student (STU-XXX) or a converted prospect client (C-XXX)
+    const isRealStudent = student.studentId.startsWith('STU-');
 
     if (isRealStudent) {
       // Edit as student
