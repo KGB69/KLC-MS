@@ -209,6 +209,7 @@ export interface Student {
   howTheyHeardAboutUs: HowTheyHeardAboutUs;
   howTheyHeardAboutUsOther?: string;
   fees: number;
+  languageOfStudy?: string; // Language the student is learning
   serviceInterestedIn?: ServiceType; // For converted prospect clients
 
   // User attribution

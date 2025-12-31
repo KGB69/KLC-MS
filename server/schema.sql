@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS students (
     mother_tongue TEXT,
     how_heard_about_us TEXT,
     how_heard_about_us_other TEXT,
+    language_of_study TEXT,
     fees NUMERIC,
     
     -- Attribution

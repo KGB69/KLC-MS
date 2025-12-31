@@ -743,6 +743,14 @@ const App: React.FC = () => {
             </div>
           )}
 
+          {editingStudent && (
+            <StudentEditForm
+              student={editingStudent}
+              onSubmit={handleUpdateStudent}
+              onCancel={() => setEditingStudent(null)}
+            />
+          )}
+
           {enrollingStudent && (
             <EnrollmentModal
               student={enrollingStudent}
