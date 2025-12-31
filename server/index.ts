@@ -109,6 +109,18 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
     }
 });
 
+app.post('/api/auth/refresh', authenticateToken, async (req: AuthRequest, res: Response) => {
+    try {
+        // User is already authenticated via middleware, issue new token
+        const user = req.user;
+        const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
+        res.json({ token });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Token refresh failed' });
+    }
+});
+
 // --- Prospect Routes ---
 
 app.get('/api/prospects', authenticateToken, async (req: AuthRequest, res: Response) => {
