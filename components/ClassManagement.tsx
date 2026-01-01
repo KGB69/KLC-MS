@@ -54,8 +54,8 @@ const ClassManagement: React.FC<ClassManagementProps> = ({ dataStore, onEditClas
               <button
                 onClick={() => setView('schedule')}
                 className={`px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors ${view === 'schedule'
-                    ? 'bg-white text-brand-primary shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white text-brand-primary shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
                   }`}
               >
                 Schedule
@@ -63,8 +63,8 @@ const ClassManagement: React.FC<ClassManagementProps> = ({ dataStore, onEditClas
               <button
                 onClick={() => setView('list')}
                 className={`px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors ${view === 'list'
-                    ? 'bg-white text-brand-primary shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white text-brand-primary shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
                   }`}
               >
                 List
@@ -100,7 +100,11 @@ const ClassManagement: React.FC<ClassManagementProps> = ({ dataStore, onEditClas
             </div>
           </div>
         ) : (
-          <ClassList classes={classes} onEdit={onEditClass} onDelete={onDeleteClass} />
+          <ClassList
+            classes={classes}
+            onEdit={onEditClass}
+            onDelete={(classItem: Class) => onDeleteClass(classItem.id)}
+          />
         )}
       </div>
     </div>
