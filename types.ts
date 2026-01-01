@@ -429,3 +429,79 @@ export interface ExpenditureDataStore {
   updateExpenditure(expenditureId: string, updates: Partial<Expenditure>): Promise<Expenditure | undefined>;
   deleteExpenditure(expenditureId: string): Promise<boolean>;
 }
+
+// ==========================================
+// Class Schedule Types
+// ==========================================
+
+export enum ClassStatus {
+  Scheduled = 'scheduled',
+  InProgress = 'in-progress',
+  Completed = 'completed',
+  Cancelled = 'cancelled'
+}
+
+export interface ClassScheduleEvent {
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+
+  // Class details
+  className: string;
+  language: string;
+  level: string;
+  teacherId: string;
+  teacherName: string;
+  room?: string;
+
+  // Enrollment
+  capacity: number;
+  enrolledStudents: string[];
+
+  // Status & metadata
+  status: ClassStatus;
+  isRecurring: boolean;
+  recurringGroupId?: string;
+  notes?: string;
+
+  // Visual
+  color: string;
+  backgroundColor: string;
+}
+
+export interface ClassEnrollment {
+  id: string;
+  classId: string;
+  studentId: string;
+  enrolledAt: string;
+  attendanceStatus?: 'present' | 'absent' | 'late';
+  notes?: string;
+}
+
+export interface ClassScheduleFormData {
+  className: string;
+  language: string;
+  level: string;
+  startDatetime: string;
+  endDatetime: string;
+  teacherId: string;
+  teacherName: string;
+  room?: string;
+  capacity: number;
+  isRecurring: boolean;
+  notes?: string;
+  color?: string;
+}
+
+export interface ClassScheduleDataStore {
+  addClassSchedule(data: ClassScheduleFormData): Promise<ClassScheduleEvent>;
+  getAllClassSchedules(startDate?: string, endDate?: string, status?: string): Promise<ClassScheduleEvent[]>;
+  getClassSchedule(id: string): Promise<ClassScheduleEvent | undefined>;
+  updateClassSchedule(id: string, updates: Partial<ClassScheduleFormData>): Promise<ClassScheduleEvent | undefined>;
+  deleteClassSchedule(id: string): Promise<boolean>;
+  enrollStudent(classId: string, studentId: string): Promise<ClassEnrollment>;
+  unenrollStudent(enrollmentId: string): Promise<boolean>;
+  getClassEnrollments(classId: string): Promise<ClassEnrollment[]>;
+  markAttendance(enrollmentId: string, status: 'present' | 'absent' | 'late'): Promise<boolean>;
+}
