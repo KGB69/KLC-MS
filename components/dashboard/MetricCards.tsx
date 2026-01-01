@@ -192,22 +192,8 @@ const MetricCards: React.FC<MetricCardProps> = ({ prospectStore, onNavigate }) =
 
     return (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-bold text-slate-800">Dashboard Metrics</h2>
-                {onNavigate && (
-                    <button
-                        onClick={() => onNavigate('finance')}
-                        className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-brand-primary hover:bg-brand-primary hover:text-white border border-brand-primary rounded-lg transition-colors"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span className="hidden sm:inline">View Finance Details</span>
-                        <span className="sm:hidden">Finance</span>
-                    </button>
-                )}
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:divide-x divide-slate-200">
+            <h2 className="text-lg font-bold text-slate-800 mb-4">Dashboard Metrics</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:divide-x divide-y sm:divide-y-0 divide-slate-200">
                 {/* Prospects Gauge */}
                 <GaugeChart
                     title="Prospects"
@@ -224,19 +210,30 @@ const MetricCards: React.FC<MetricCardProps> = ({ prospectStore, onNavigate }) =
                 />
 
                 {/* Receipts/Expenditures Gauge with Toggle */}
-                <div className="relative">
-                    {/* Toggle Button */}
-                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 z-10">
+                <div className="relative pt-6 sm:pt-0">
+                    {/* Header with Toggle and Finance Button */}
+                    <div className="flex items-center justify-center gap-2 mb-3">
                         <button
                             onClick={() => setShowExpenditures(!showExpenditures)}
-                            className="flex items-center gap-2 px-3 py-1 bg-white border border-slate-300 rounded-full text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
+                            className="flex items-center gap-2 px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
                         >
-                            <span className={!showExpenditures ? 'text-brand-primary' : 'text-slate-500'}>Receipts</span>
-                            <div className="relative w-8 h-4 bg-slate-200 rounded-full">
-                                <div className={`absolute top-0.5 left-0.5 w-3 h-3 bg-brand-primary rounded-full transition-transform ${showExpenditures ? 'translate-x-4' : ''}`} />
+                            <span className={!showExpenditures ? 'text-brand-primary font-semibold' : 'text-slate-500'}>Receipts</span>
+                            <div className="relative w-7 h-3.5 bg-slate-200 rounded-full">
+                                <div className={`absolute top-0.5 left-0.5 w-2.5 h-2.5 bg-brand-primary rounded-full transition-transform ${showExpenditures ? 'translate-x-3.5' : ''}`} />
                             </div>
-                            <span className={showExpenditures ? 'text-brand-primary' : 'text-slate-500'}>Expenditures</span>
+                            <span className={showExpenditures ? 'text-brand-primary font-semibold' : 'text-slate-500'}>Expenditures</span>
                         </button>
+                        {onNavigate && (
+                            <button
+                                onClick={() => onNavigate('finance')}
+                                className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-slate-600 hover:text-brand-primary hover:bg-slate-50 border border-slate-200 rounded-md transition-colors"
+                                title="View Finance Details"
+                            >
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                </svg>
+                            </button>
+                        )}
                     </div>
 
                     {!showExpenditures ? (
