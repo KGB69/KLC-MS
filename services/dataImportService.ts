@@ -1,4 +1,7 @@
 import type { ExportData } from './dataExportService';
+import type { ProspectDataStore, StudentDataStore, ClassDataStore, PaymentDataStore, ExpenditureDataStore } from '../types';
+
+export type ImportDataStore = ProspectDataStore & StudentDataStore & ClassDataStore & PaymentDataStore & ExpenditureDataStore;
 
 export interface ImportResult {
     success: boolean;
@@ -26,7 +29,7 @@ export function validateImportData(data: any): boolean {
     return true;
 }
 
-export async function importData(file: File, store: any): Promise<ImportResult> {
+export async function importData(file: File, store: ImportDataStore): Promise<{ success: boolean; imported: any; skipped: number; errors: string[] }> {
     const result: ImportResult = {
         success: false,
         imported: {
@@ -65,10 +68,7 @@ export async function importData(file: File, store: any): Promise<ImportResult> 
             }
             try {
                 // Import with existing ID and attribution
-                await store.addProspect({
-                    ...prospect,
-                    id: prospect.id, // Preserve original ID
-                });
+                await store.addProspectWithId(prospect.id, prospect);
                 result.imported.prospects++;
             } catch (error) {
                 result.errors.push(`Failed to import prospect: ${prospect.prospectName}`);

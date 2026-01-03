@@ -1,6 +1,11 @@
-
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { Prospect, SearchCriteria, ProspectFormData, ServiceType, ContactMethod, FollowUpAction, FollowUpStatus, FollowUpFormData, ProspectStatus, Student, StudentFormData, StudentDetailsFormData, ClassFormData, Class, ClassLevel, DayOfWeek } from './types';
+import {
+  Prospect, SearchCriteria, ProspectFormData, ServiceType, ContactMethod,
+  FollowUpAction, FollowUpStatus, FollowUpFormData, ProspectStatus, Student,
+  StudentFormData, StudentDetailsFormData, ClassFormData, Class, ClassLevel,
+  DayOfWeek, ActiveView, ProspectDataStore, StudentDataStore, ClassDataStore,
+  PaymentDataStore, ExpenditureDataStore, CommunicationFormData
+} from './types';
 import ProspectForm from './components/ProspectForm';
 import ProspectList from './components/ProspectList';
 import FilterControls from './components/FilterControls';
@@ -26,8 +31,6 @@ import Sidebar from './components/layout/Sidebar';
 import Modal from './components/shared/Modal';
 import TopBar from './components/layout/TopBar';
 import DashboardView from './components/dashboard/DashboardView';
-
-type ActiveView = 'dashboard' | 'prospects' | 'clients' | 'classes' | 'conversions' | 'finance' | 'settings' | 'communications';
 
 // Sample data to seed the database on the first run.
 const initialProspects: ProspectFormData[] = [

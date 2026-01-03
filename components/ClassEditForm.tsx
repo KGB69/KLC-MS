@@ -17,6 +17,7 @@ const ClassEditForm: React.FC<ClassEditFormProps> = ({ onSubmit, onCancel, initi
     language: '',
     level: ClassLevel.A1_1,
     teacherId: '',
+    roomNumber: '',
   });
   const [schedule, setSchedule] = useState<ClassSchedule[]>([]);
   const [newSession, setNewSession] = useState<ClassSchedule>({
@@ -51,6 +52,7 @@ const ClassEditForm: React.FC<ClassEditFormProps> = ({ onSubmit, onCancel, initi
         language: initialData.language,
         level: initialData.level,
         teacherId: initialData.teacherId,
+        roomNumber: initialData.roomNumber || '',
       });
       setSchedule(initialData.schedule || []);
       setSelectedStudentIds(initialData.studentIds || []); // Load existing enrollment
@@ -159,6 +161,18 @@ const ClassEditForm: React.FC<ClassEditFormProps> = ({ onSubmit, onCancel, initi
               placeholder="e.g., T-101"
               className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-primary focus:border-brand-primary"
               required
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label htmlFor="roomNumber" className="block text-sm font-medium text-slate-600 mb-1">Room Number</label>
+            <input
+              type="text" id="roomNumber" name="roomNumber"
+              value={formData.roomNumber || ''}
+              onChange={handleChange}
+              placeholder="e.g., Room 201"
+              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-primary focus:border-brand-primary"
             />
           </div>
         </div>

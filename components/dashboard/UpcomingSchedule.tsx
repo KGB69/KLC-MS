@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { IndexedDBProspectDataStore } from '../../services/indexedDBProspectStore';
-import { Class, DayOfWeek } from '../../types';
+import { Class, DayOfWeek, ClassDataStore } from '../../types';
 
 interface UpcomingScheduleProps {
-    prospectStore: IndexedDBProspectDataStore;
+    prospectStore: ClassDataStore;
 }
 
 interface ScheduleItem {

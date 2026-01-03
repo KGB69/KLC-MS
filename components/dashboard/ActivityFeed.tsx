@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { IndexedDBProspectDataStore } from '../../services/indexedDBProspectStore';
-import { Prospect, Student } from '../../types';
+import { Prospect, Student, ProspectDataStore, StudentDataStore, ClassDataStore } from '../../types';
 
 interface ActivityFeedProps {
-    prospectStore: IndexedDBProspectDataStore;
+    prospectStore: ProspectDataStore & StudentDataStore & ClassDataStore;
 }
 
 interface ActivityItem {

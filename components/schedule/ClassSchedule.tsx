@@ -3,9 +3,10 @@ import { Calendar, dateFnsLocalizer, View } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay, startOfDay, endOfDay, startOfMonth, endOfMonth, startOfISOWeek, endOfISOWeek } from 'date-fns';
 import { ClassScheduleEvent, ClassStatus } from '../../types';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { enUS } from 'date-fns/locale';
 
 const locales = {
-    'en-US': require('date-fns/locale/en-US')
+    'en-US': enUS
 };
 
 const localizer = dateFnsLocalizer({
@@ -15,6 +16,43 @@ const localizer = dateFnsLocalizer({
     getDay,
     locales,
 });
+
+// Custom event component - compact display for timetable
+const EventComponent = ({ event }: { event: any }) => {
+    // Get language initial (first letter)
+    const langInitial = event.language?.charAt(0) || '';
+    // Compact format: "G A2.1 R201" instead of "German A2.1 Room 201"
+    const compactText = `${langInitial} ${event.level}${event.roomNumber ? ' R' + event.roomNumber.replace(/room\s*/i, '') : ''}`;
+
+    return (
+        <div className="p-1 leading-none">
+            <div className="font-bold text-xs truncate">{compactText}</div>
+        </div>
+    );
+};
+
+// Calendar custom styles for better spacing
+const calendarStyles = `
+    .rbc-event {
+        padding: 4px 6px !important;
+        font-size: 0.75rem !important;
+        line-height: 1.2 !important;
+        overflow: visible !important;
+    }
+    .rbc-event-content {
+        white-space: normal !important;
+        overflow: visible !important;
+    }
+    .rbc-time-slot {
+        min-height: 45px !important;
+    }
+    .rbc-events-container {
+        margin-right: 2px;
+    }
+    .rbc-day-slot .rbc-event {
+        border: 1px solid rgba(0,0,0,0.1);
+    }
+`;
 
 interface ClassScheduleProps {
     onNavigate?: (view: 'classes') => void;
@@ -60,8 +98,15 @@ const ClassSchedule: React.FC<ClassScheduleProps> = ({ onNavigate }) => {
                 endDate = endOfDay(date);
             }
 
+            const token = localStorage.getItem('authToken');
             const response = await fetch(
-                `/api/class-schedules?start=${startDate.toISOString()}&end=${endDate.toISOString()}`
+                `/api/class-schedules?start=${startDate.toISOString()}&end=${endDate.toISOString()}`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
             );
             const data = await response.json();
 
@@ -153,8 +198,8 @@ const ClassSchedule: React.FC<ClassScheduleProps> = ({ onNavigate }) => {
                                 key={v}
                                 onClick={() => setView(v)}
                                 className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${view === v
-                                        ? 'bg-white text-brand-primary shadow-sm'
-                                        : 'text-slate-600 hover:text-slate-900'
+                                    ? 'bg-white text-brand-primary shadow-sm'
+                                    : 'text-slate-600 hover:text-slate-900'
                                     }`}
                             >
                                 {v.charAt(0).toUpperCase() + v.slice(1)}
@@ -175,6 +220,7 @@ const ClassSchedule: React.FC<ClassScheduleProps> = ({ onNavigate }) => {
             {/* Calendar */}
             <div className="flex-1 flex gap-4 p-4 overflow-hidden">
                 <div className="flex-1 min-h-0">
+                    <style>{calendarStyles}</style>
                     <Calendar
                         localizer={localizer}
                         events={events}
@@ -191,6 +237,11 @@ const ClassSchedule: React.FC<ClassScheduleProps> = ({ onNavigate }) => {
                         showMultiDayTimes
                         formats={formats}
                         popup
+                        min={new Date(2026, 0, 1, 7, 0, 0)}
+                        max={new Date(2026, 0, 1, 22, 0, 0)}
+                        components={{
+                            event: EventComponent
+                        }}
                     />
                 </div>
 

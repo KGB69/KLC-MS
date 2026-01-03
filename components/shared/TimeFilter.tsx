@@ -21,8 +21,8 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ currentFilter, onFilterChange, 
         { value: 'all', label: 'All' },
     ];
 
-    const handleDateRangeApply = (startDate: string, endDate: string) => {
-        onFilterChange('custom', { startDate, endDate });
+    const handleDateRangeApply = (range: CustomDateRange) => {
+        onFilterChange('custom', range);
     };
 
     const formatCustomRange = () => {
@@ -76,8 +76,10 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ currentFilter, onFilterChange, 
 
             {showDatePicker && (
                 <DateRangePicker
+                    isOpen={showDatePicker}
                     onApply={handleDateRangeApply}
                     onClose={() => setShowDatePicker(false)}
+                    initialRange={customRange}
                 />
             )}
         </>

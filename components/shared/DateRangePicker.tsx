@@ -1,13 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 
+import { CustomDateRange } from '../../utils/dateFilters';
+
 interface DateRangePickerProps {
-    onApply: (startDate: string, endDate: string) => void;
+    isOpen: boolean;
+    onApply: (range: CustomDateRange) => void;
     onClose: () => void;
+    initialRange?: CustomDateRange;
 }
 
-const DateRangePicker: React.FC<DateRangePickerProps> = ({ onApply, onClose }) => {
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
+const DateRangePicker: React.FC<DateRangePickerProps> = ({ onApply, onClose, initialRange }) => {
+    const [startDate, setStartDate] = useState(initialRange?.startDate || '');
+    const [endDate, setEndDate] = useState(initialRange?.endDate || '');
     const modalRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -23,7 +27,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ onApply, onClose }) =
 
     const handleApply = () => {
         if (startDate && endDate) {
-            onApply(startDate, endDate);
+            onApply({ startDate, endDate });
             onClose();
         }
     };
@@ -105,8 +109,8 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ onApply, onClose }) =
                         onClick={handleApply}
                         disabled={!startDate || !endDate}
                         className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors ${startDate && endDate
-                                ? 'bg-brand-primary hover:bg-sky-700'
-                                : 'bg-slate-300 cursor-not-allowed'
+                            ? 'bg-brand-primary hover:bg-sky-700'
+                            : 'bg-slate-300 cursor-not-allowed'
                             }`}
                     >
                         Apply

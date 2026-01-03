@@ -21,8 +21,8 @@ const FollowUpForm: React.FC<FollowUpFormProps> = ({ onSubmit }) => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!formData.assignedTo.trim() || !formData.notes.trim()) {
-      alert("Please fill in both 'Assigned To' and 'Notes'.");
+    if (!formData.notes.trim()) {
+      alert("Please fill in the Notes field.");
       return;
     }
     onSubmit(formData);
@@ -56,7 +56,6 @@ const FollowUpForm: React.FC<FollowUpFormProps> = ({ onSubmit }) => {
               onChange={handleChange}
               placeholder="e.g., Jane Doe"
               className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-primary focus:border-brand-primary"
-              required
             />
           </div>
         </div>
@@ -79,7 +78,7 @@ const FollowUpForm: React.FC<FollowUpFormProps> = ({ onSubmit }) => {
             className="flex items-center justify-center bg-brand-primary text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-all duration-200"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+              <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
             </svg>
             Add Task
           </button>

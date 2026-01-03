@@ -14,9 +14,12 @@ const toCamel = (obj: any): any => {
         return obj;
     }
 
-    // Handle Date objects - convert to YYYY-MM-DD format
+    // Handle Date objects - convert to YYYY-MM-DD format (timezone-safe)
     if (obj instanceof Date) {
-        return obj.toISOString().split('T')[0];
+        const year = obj.getFullYear();
+        const month = String(obj.getMonth() + 1).padStart(2, '0');
+        const day = String(obj.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
 
     // Handle arrays
@@ -228,12 +231,12 @@ app.get('/api/students', authenticateToken, async (req: AuthRequest, res: Respon
 });
 
 app.post('/api/students', authenticateToken, async (req: AuthRequest, res: Response) => {
-    const { name, email, phone, registrationDate, dateOfBirth, nationality, occupation, address, motherTongue, howHeardAboutUs, howHeardAboutUsOther, fees } = req.body;
+    const { name, email, phone, registrationDate, dateOfBirth, nationality, occupation, address, motherTongue, howHeardAboutUs, howHeardAboutUsOther, languageOfStudy, fees } = req.body;
     const datePart = registrationDate.replace(/-/g, '').slice(2);
     try {
         const result = await query(
-            'INSERT INTO students (name, email, phone, registration_date, student_id, date_of_birth, nationality, occupation, address, mother_tongue, how_heard_about_us, how_heard_about_us_other, fees, created_by) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *',
-            [name, email, phone, registrationDate, `STU-${datePart}-${Date.now().toString().slice(-4)}`, dateOfBirth, nationality, occupation, address, motherTongue, howHeardAboutUs, howHeardAboutUsOther, fees, req.user.id]
+            'INSERT INTO students (name, email, phone, registration_date, student_id, date_of_birth, nationality, occupation, address, mother_tongue, how_heard_about_us, how_heard_about_us_other, language_of_study, fees, created_by) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *',
+            [name, email, phone, registrationDate, `STU-${datePart}-${Date.now().toString().slice(-4)}`, dateOfBirth, nationality, occupation, address, motherTongue, howHeardAboutUs, howHeardAboutUsOther, languageOfStudy, fees, req.user.id]
         );
         res.status(201).json(toCamel(result.rows[0]));
     } catch (err) {
@@ -264,13 +267,13 @@ app.get('/api/classes', authenticateToken, async (req: AuthRequest, res: Respons
 });
 
 app.post('/api/classes', authenticateToken, async (req: AuthRequest, res: Response) => {
-    const { name, language, level, teacherId, schedule } = req.body;
+    const { name, language, level, teacherId, roomNumber, schedule } = req.body;
     const classId = `CLS-${Date.now().toString().slice(-6)}`;
     try {
         await query('BEGIN');
         const result = await query(
-            'INSERT INTO classes (class_id, name, language, level, teacher_id, created_by) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-            [classId, name, language, level, teacherId, req.user.id]
+            'INSERT INTO classes (class_id, name, language, level, teacher_id, room_number, created_by) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+            [classId, name, language, level, teacherId, roomNumber, req.user.id]
         );
         for (const s of schedule) {
             await query('INSERT INTO class_schedules (class_id, day_of_week, start_time, end_time) VALUES ($1, $2, $3, $4)', [classId, s.dayOfWeek, s.startTime, s.endTime]);
@@ -281,6 +284,64 @@ app.post('/api/classes', authenticateToken, async (req: AuthRequest, res: Respon
         await query('ROLLBACK');
         console.error(err);
         res.status(500).json({ message: 'Failed to add class' });
+    }
+});
+
+app.get('/api/class-schedules', authenticateToken, async (req: AuthRequest, res: Response) => {
+    const { start, end } = req.query;
+
+    try {
+        const result = await query(`
+            SELECT cs.*, c.name as class_name, c.language, c.level, c.teacher_id, c.room_number
+            FROM class_schedules cs
+            JOIN classes c ON cs.class_id = c.class_id
+        `);
+
+        const startDate = new Date(start as string);
+        const endDate = new Date(end as string);
+        const events: any[] = [];
+
+        result.rows.forEach((schedule: any) => {
+            const dayOfWeek = schedule.day_of_week;
+            const startTime = schedule.start_time;
+            const endTime = schedule.end_time;
+
+            const current = new Date(startDate);
+            while (current <= endDate) {
+                const dayName = current.toLocaleDateString('en-US', { weekday: 'long' });
+
+                if (dayName === dayOfWeek) {
+                    const [startHour, startMin] = startTime.split(':');
+                    const eventStart = new Date(current);
+                    eventStart.setHours(parseInt(startHour), parseInt(startMin), 0, 0);
+
+                    const [endHour, endMin] = endTime.split(':');
+                    const eventEnd = new Date(current);
+                    eventEnd.setHours(parseInt(endHour), parseInt(endMin), 0, 0);
+
+                    events.push({
+                        id: `${schedule.id}-${current.toISOString().split('T')[0]}`,
+                        scheduleId: schedule.id,
+                        classId: schedule.class_id,
+                        title: schedule.class_name,
+                        language: schedule.language,
+                        level: schedule.level,
+                        teacherId: schedule.teacher_id,
+                        roomNumber: schedule.room_number,
+                        start: eventStart.toISOString(),
+                        end: eventEnd.toISOString(),
+                        dayOfWeek: dayOfWeek
+                    });
+                }
+
+                current.setDate(current.getDate() + 1);
+            }
+        });
+
+        res.json(events);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to fetch class schedules' });
     }
 });
 
@@ -406,14 +467,44 @@ app.get('/api/followups', authenticateToken, async (req: AuthRequest, res: Respo
 app.post('/api/followups', authenticateToken, async (req: AuthRequest, res: Response) => {
     const { prospectId, dueDate, notes, assignedTo } = req.body;
     try {
+        console.log('Creating follow-up with data:', { prospectId, dueDate, notes, assignedTo, userId: req.user?.id });
+
+        // Validate required fields
+        if (!prospectId) {
+            return res.status(400).json({ message: 'Prospect ID is required' });
+        }
+        if (!dueDate) {
+            return res.status(400).json({ message: 'Due date is required' });
+        }
+
+        // Create follow-up action
         const result = await query(
             'INSERT INTO follow_up_actions (prospect_id, due_date, notes, assigned_to) VALUES ($1, $2, $3, $4) RETURNING *',
             [prospectId, dueDate, notes, assignedTo || req.user.id]
         );
+
+        // Also create communication entry for dashboard/communications tab
+        await query(
+            `INSERT INTO communications (type, title, description, prospect_id, assigned_to, due_date, status, priority, created_by) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+            [
+                'prospect-followup',
+                notes || 'Follow-up scheduled',
+                notes,
+                prospectId,
+                assignedTo || 'Unassigned',
+                dueDate,
+                'Pending',
+                'medium',
+                req.user.id
+            ]
+        );
+
         res.status(201).json(toCamel(result.rows[0]));
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Failed to add follow-up' });
+        console.error('Error creating follow-up:', err);
+        console.error('Request body was:', req.body);
+        res.status(500).json({ message: 'Failed to add follow-up', error: (err as Error).message });
     }
 });
 
@@ -438,6 +529,35 @@ app.delete('/api/expenditures/:id', authenticateToken, async (req: AuthRequest, 
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Failed to delete expenditure' });
+    }
+});
+
+app.delete('/api/followups/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    try {
+        await query('DELETE FROM follow_up_actions WHERE id = $1', [id]);
+        res.status(204).send();
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to delete follow-up' });
+    }
+});
+
+app.put('/api/followups/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    const { dueDate, assignedTo, notes, status, outcome } = req.body;
+    try {
+        const result = await query(
+            'UPDATE follow_up_actions SET due_date = $1, assigned_to = $2, notes = $3, status = $4, outcome = $5 WHERE id = $6 RETURNING *',
+            [dueDate, assignedTo, notes, status, outcome, id]
+        );
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Follow-up not found' });
+        }
+        res.json(toCamel(result.rows[0]));
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to update follow-up' });
     }
 });
 

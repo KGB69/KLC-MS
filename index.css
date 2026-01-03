@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* ============================================
    CRM Application - Custom Design System
    ============================================ */
@@ -1434,5 +1438,28 @@ a:hover {
     .card {
         box-shadow: none;
         border: 1px solid var(--color-gray-300);
+    }
+}
+/* ============================================
+   Dashboard Metrics Custom Grid
+   ============================================ */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+    .metrics-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .metrics-grid > *:not(:last-child) {
+        border-right: 1px solid #e2e8f0;
+    }
+    
+    .metrics-item-padding {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
     }
 }

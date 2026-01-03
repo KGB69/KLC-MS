@@ -140,6 +140,8 @@ export const commonEuropeanLanguages = [
   "English", "Spanish", "French", "German", "Italian", "Portuguese", "Russian"
 ];
 
+export type ActiveView = 'dashboard' | 'prospects' | 'clients' | 'classes' | 'conversions' | 'finance' | 'settings' | 'communications';
+
 export interface Prospect {
   id: string;
   prospectName: string;
@@ -163,6 +165,8 @@ export interface Prospect {
   trainingLanguages?: string[];
   translationSourceLanguage?: string;
   translationTargetLanguage?: string;
+  interpretationSourceLanguage?: string;
+  interpretationTargetLanguage?: string;
 
   // Translation completion details
   translationCompletionDate?: string;
@@ -233,6 +237,7 @@ export interface Class {
   language: string;
   level: ClassLevel;
   teacherId: string; // For now, just an ID. Could be linked to a Teacher object later.
+  roomNumber?: string;
   schedule: ClassSchedule[];
   studentIds: string[];
 
@@ -342,6 +347,7 @@ export interface ClassFormData {
   language: string;
   level: ClassLevel;
   teacherId: string;
+  roomNumber?: string;
   schedule: ClassSchedule[];
   studentIds: string[];
 }
@@ -384,6 +390,7 @@ export interface SearchCriteria {
 
 export interface ProspectDataStore {
   addProspect(prospectData: ProspectFormData): Promise<Prospect>;
+  addProspectWithId(id: string, prospectData: Prospect): Promise<Prospect>;
   getProspect(id: string): Promise<Prospect | undefined>;
   updateProspect(id: string, updates: Partial<Prospect>): Promise<Prospect | undefined>;
   updateProspectStatus(id: string, status: ProspectStatus): Promise<Prospect | undefined>;
@@ -396,6 +403,13 @@ export interface ProspectDataStore {
   getFollowUpsForProspect(prospectId: string): Promise<FollowUpAction[]>;
   updateFollowUp(id: string, updates: Partial<Pick<FollowUpAction, 'status' | 'outcome'>>): Promise<FollowUpAction | undefined>;
   deleteFollowUp(id: string): Promise<boolean>;
+  getAllFollowUps(): Promise<FollowUpAction[]>;
+
+  // Methods for managing Communications
+  getAllCommunications(): Promise<Communication[]>;
+  addCommunication(communicationData: CommunicationFormData): Promise<Communication>;
+  updateCommunication(id: string, updates: Partial<Communication>): Promise<Communication | undefined>;
+  deleteCommunication(id: string): Promise<boolean>;
 }
 
 export interface StudentDataStore {

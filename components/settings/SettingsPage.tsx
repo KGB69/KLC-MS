@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { IndexedDBProspectDataStore } from '../../services/indexedDBProspectStore';
+import { ProspectDataStore, StudentDataStore, ClassDataStore, PaymentDataStore, ExpenditureDataStore } from '../../types';
 import { exportAllData, downloadJSON, uploadToServer } from '../../services/dataExportService';
 import { importData, downloadFromServer } from '../../services/dataImportService';
 import StorageDashboard from './StorageDashboard';
 import BackupSettings from './BackupSettings';
 
 interface SettingsPageProps {
-    prospectStore: IndexedDBProspectDataStore;
+    prospectStore: ProspectDataStore & StudentDataStore & ClassDataStore & PaymentDataStore & ExpenditureDataStore;
 }
 
 const SettingsPage: React.FC<SettingsPageProps> = ({ prospectStore }) => {

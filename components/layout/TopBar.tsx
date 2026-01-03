@@ -1,6 +1,4 @@
-import React from 'react';
-
-type ActiveView = 'dashboard' | 'prospects' | 'students' | 'classes' | 'completed' | 'finance' | 'settings';
+import { ActiveView } from '../../types';
 
 interface TopBarProps {
     username: string;
@@ -13,11 +11,12 @@ const TopBar: React.FC<TopBarProps> = ({ username, onLogout, activeView, onToggl
     const viewLabels: Record<ActiveView, string> = {
         dashboard: 'Dashboard',
         prospects: 'Prospects',
-        students: 'Students',
+        clients: 'Clients',
         classes: 'Classes',
-        completed: 'Completed Jobs',
+        conversions: 'Completed Jobs',
         finance: 'Finance',
         settings: 'Settings',
+        communications: 'Tasks',
     };
 
     return (

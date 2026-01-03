@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Prospect, FollowUpAction, FollowUpStatus } from '../types';
+import { Prospect, FollowUpAction, FollowUpStatus, ProspectDataStore } from '../types';
 import ProspectsTable from './prospect/ProspectsTable';
-import { IndexedDBProspectDataStore } from '../services/indexedDBProspectStore';
 
 interface ProspectListProps {
-  prospectStore: IndexedDBProspectDataStore;
+  prospectStore: ProspectDataStore;
   prospects: Prospect[];
   onEdit: (prospect: Prospect) => void;
   onDelete: (prospect: Prospect) => void;

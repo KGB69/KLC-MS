@@ -6,7 +6,7 @@ import ClassSchedule from './schedule/ClassSchedule';
 interface ClassManagementProps {
   dataStore: ClassDataStore;
   onEditClass: (cls: Class) => void;
-  onDeleteClass: (classId: string) => void;
+  onDeleteClass: (cls: Class) => void;
   onShowAddForm: () => void;
   dataVersion?: number;
 }
@@ -38,72 +38,71 @@ const ClassManagement: React.FC<ClassManagementProps> = ({ dataStore, onEditClas
   }, [fetchClasses, dataVersion]);
 
   return (
-    <div className="animate-fade-in h-full flex flex-col">
-      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200 mb-6">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+    <div className="animate-fade-in">
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-brand-dark mb-1 sm:mb-2">Class Management</h2>
-            <p className="text-sm sm:text-base text-brand-secondary">
-              Manage language classes, teachers, and schedules.
+            <h2 className="text-2xl font-bold text-brand-dark mb-2">Class Management</h2>
+            <p className="text-brand-secondary">
+              Schedule lessons, manage enrollments, and track progress.
             </p>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex items-center space-x-4">
             {/* View Switcher */}
-            <div className="flex items-center bg-slate-100 rounded-lg p-1">
+            <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200">
               <button
                 onClick={() => setView('schedule')}
-                className={`px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors ${view === 'schedule'
-                  ? 'bg-white text-brand-primary shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${view === 'schedule'
+                    ? 'bg-white text-brand-primary shadow-sm'
+                    : 'text-slate-600 hover:text-brand-dark'
                   }`}
               >
                 Schedule
               </button>
               <button
                 onClick={() => setView('list')}
-                className={`px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors ${view === 'list'
-                  ? 'bg-white text-brand-primary shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${view === 'list'
+                    ? 'bg-white text-brand-primary shadow-sm'
+                    : 'text-slate-600 hover:text-brand-dark'
                   }`}
               >
-                List
+                List View
               </button>
             </div>
 
             <button
               onClick={onShowAddForm}
-              className="flex items-center justify-center bg-brand-primary text-white font-semibold py-2 px-3 sm:px-4 rounded-lg shadow-md hover:bg-sky-700 text-xs sm:text-sm"
+              className="bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-dark transition-all shadow-sm flex items-center"
             >
-              <span className="hidden sm:inline">New Class</span>
-              <span className="sm:hidden">+</span>
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              New Class
             </button>
           </div>
         </div>
       </div>
 
       {error && (
-        <div className="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md">
-          <p className="font-bold">Error</p>
+        <div className="mb-8 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md">
           <p>{error}</p>
         </div>
       )}
 
-      <div className="flex-1 min-h-0">
-        {view === 'schedule' ? (
-          <ClassSchedule />
-        ) : isLoading ? (
-          <div className="h-full flex items-center justify-center bg-white rounded-xl shadow-sm border border-slate-200">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary mx-auto"></div>
-              <h3 className="mt-4 text-lg font-medium text-brand-dark">Loading Classes...</h3>
-            </div>
+      <div>
+        {isLoading ? (
+          <div className="text-center py-16 px-6 bg-white rounded-xl shadow-sm border border-slate-200">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary mx-auto"></div>
+            <h3 className="mt-4 text-lg font-medium text-brand-dark">Loading Classes...</h3>
           </div>
+        ) : view === 'schedule' ? (
+          <ClassSchedule />
         ) : (
           <ClassList
             classes={classes}
             onEdit={onEditClass}
-            onDelete={(classItem: Class) => onDeleteClass(classItem.id)}
+            onDelete={onDeleteClass}
           />
         )}
       </div>

@@ -1,7 +1,10 @@
 import {
   Prospect, ProspectFormData, FollowUpAction, Student, StudentFormData,
   Class, ClassFormData, Payment, PaymentFormData, Expenditure, ExpenditureFormData,
-  SearchCriteria, Communication, CommunicationFormData
+  SearchCriteria, Communication, CommunicationFormData, ProspectStatus,
+  ProspectDataStore, StudentDataStore, ClassDataStore, PaymentDataStore,
+  ExpenditureDataStore, ClassScheduleDataStore, ClassScheduleEvent,
+  ClassScheduleFormData, ClassEnrollment
 } from '../types';
 
 const API_BASE_URL = '/api';
@@ -14,7 +17,9 @@ function getAuthHeaders(): HeadersInit {
   };
 }
 
-export class ApiProspectDataStore {
+export class ApiProspectDataStore implements
+  ProspectDataStore, StudentDataStore, ClassDataStore,
+  PaymentDataStore, ExpenditureDataStore, ClassScheduleDataStore {
   // --- Prospect Methods ---
 
   async addProspect(prospectData: ProspectFormData): Promise<Prospect> {
@@ -25,6 +30,18 @@ export class ApiProspectDataStore {
     });
     if (!response.ok) {
       throw new Error('Failed to add prospect');
+    }
+    return response.json();
+  }
+
+  async addProspectWithId(id: string, prospectData: Prospect): Promise<Prospect> {
+    const response = await fetch(`${API_BASE_URL}/prospects`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ ...prospectData, id })
+    });
+    if (!response.ok) {
+      throw new Error('Failed to add prospect with ID');
     }
     return response.json();
   }
@@ -56,7 +73,7 @@ export class ApiProspectDataStore {
     return response.json();
   }
 
-  async updateProspectStatus(id: string, status: any): Promise<Prospect | undefined> {
+  async updateProspectStatus(id: string, status: ProspectStatus): Promise<Prospect | undefined> {
     return this.updateProspect(id, { status });
   }
 
@@ -174,7 +191,7 @@ export class ApiProspectDataStore {
     return students.find(s => s.id === id);
   }
 
-  async updateStudent(id: string, updates: Partial<Student>): Promise<Student | undefined> {
+  async updateStudent(id: string, updates: StudentFormData): Promise<Student | undefined> {
     const response = await fetch(`${API_BASE_URL}/students/${id}`, {
       method: 'PUT',
       headers: getAuthHeaders(),
@@ -223,7 +240,7 @@ export class ApiProspectDataStore {
     return classes.find(c => c.classId === classId);
   }
 
-  async updateClass(classId: string, updates: Partial<Class>): Promise<Class | undefined> {
+  async updateClass(classId: string, updates: ClassFormData): Promise<Class | undefined> {
     const response = await fetch(`${API_BASE_URL}/classes/${classId}`, {
       method: 'PUT',
       headers: getAuthHeaders(),
@@ -243,22 +260,31 @@ export class ApiProspectDataStore {
     return response.ok;
   }
 
-  async enrollStudentInClass(studentId: string, classId: string): Promise<boolean> {
+  async assignStudentToClass(studentId: string, classId: string): Promise<void> {
     const response = await fetch(`${API_BASE_URL}/classes/${classId}/enroll`, {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify({ studentId })
     });
-    return response.ok;
+    if (!response.ok) throw new Error('Failed to enroll student');
   }
 
-  async unenrollStudentFromClass(studentId: string, classId: string): Promise<boolean> {
+  async removeStudentFromClass(studentId: string, classId: string): Promise<void> {
     const response = await fetch(`${API_BASE_URL}/classes/${classId}/unenroll`, {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify({ studentId })
     });
-    return response.ok;
+    if (!response.ok) throw new Error('Failed to unenroll student');
+  }
+
+  async updateStudentEnrollments(studentId: string, classIds: string[]): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/students/${studentId}/enrollments`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ classIds })
+    });
+    if (!response.ok) throw new Error('Failed to update student enrollments');
   }
 
   // --- Payment Methods ---
@@ -298,8 +324,11 @@ export class ApiProspectDataStore {
   }
 
   async getPaymentsForClient(clientId: string): Promise<Payment[]> {
-    const allPayments = await this.getAllPayments();
-    return allPayments.filter(p => p.clientId === clientId);
+    const response = await fetch(`${API_BASE_URL}/payments?clientId=${clientId}`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch payments for client');
+    return response.json();
   }
 
   // --- Expenditure Methods ---
@@ -371,6 +400,91 @@ export class ApiProspectDataStore {
     const response = await fetch(`${API_BASE_URL}/communications/${id}`, {
       method: 'DELETE',
       headers: getAuthHeaders()
+    });
+    return response.ok;
+  }
+
+  // --- Class Schedule Methods ---
+  async addClassSchedule(data: ClassScheduleFormData): Promise<ClassScheduleEvent> {
+    const response = await fetch(`${API_BASE_URL}/class-schedules`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error('Failed to add class schedule');
+    return response.json();
+  }
+
+  async getAllClassSchedules(startDate?: string, endDate?: string, status?: string): Promise<ClassScheduleEvent[]> {
+    const params = new URLSearchParams();
+    if (startDate) params.append('start', startDate);
+    if (endDate) params.append('end', endDate);
+    if (status) params.append('status', status);
+
+    const response = await fetch(`${API_BASE_URL}/class-schedules?${params}`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch class schedules');
+    return response.json();
+  }
+
+  async getClassSchedule(id: string): Promise<ClassScheduleEvent | undefined> {
+    const response = await fetch(`${API_BASE_URL}/class-schedules/${id}`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) return undefined;
+    return response.json();
+  }
+
+  async updateClassSchedule(id: string, updates: Partial<ClassScheduleFormData>): Promise<ClassScheduleEvent | undefined> {
+    const response = await fetch(`${API_BASE_URL}/class-schedules/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(updates)
+    });
+    if (!response.ok) throw new Error('Failed to update class schedule');
+    return response.json();
+  }
+
+  async deleteClassSchedule(id: string): Promise<boolean> {
+    const response = await fetch(`${API_BASE_URL}/class-schedules/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    return response.ok;
+  }
+
+  async enrollStudent(classId: string, studentId: string): Promise<ClassEnrollment> {
+    const response = await fetch(`${API_BASE_URL}/class-schedules/${classId}/enroll`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ studentId })
+    });
+    if (!response.ok) throw new Error('Failed to enroll student');
+    return response.json();
+  }
+
+  async unenrollStudent(enrollmentId: string): Promise<boolean> {
+    const response = await fetch(`${API_BASE_URL}/class-enrollments/${enrollmentId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    return response.ok;
+  }
+
+  async getClassEnrollments(classId: string): Promise<ClassEnrollment[]> {
+    const response = await fetch(`${API_BASE_URL}/class-schedules/${classId}/enrollments`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch enrollments');
+    return response.json();
+  }
+
+  async markAttendance(enrollmentId: string, status: 'present' | 'absent' | 'late'): Promise<boolean> {
+    const response = await fetch(`${API_BASE_URL}/class-enrollments/${enrollmentId}/attendance`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ status })
     });
     return response.ok;
   }

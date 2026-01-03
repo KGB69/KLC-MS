@@ -1,4 +1,4 @@
-import { exportAllData, downloadJSON } from './dataExportService';
+import { exportAllData, downloadJSON, ExportDataStore } from './dataExportService';
 
 const BACKUP_SCHEDULE_KEY = 'autoBackupSchedule';
 const LAST_BACKUP_KEY = 'lastBackupDate';
@@ -65,7 +65,7 @@ export function shouldBackupNow(): boolean {
     return false;
 }
 
-export async function performAutoBackup(store: any): Promise<boolean> {
+export async function performAutoBackup(store: ExportDataStore): Promise<boolean> {
     try {
         const data = await exportAllData(store);
         downloadJSON(data, `auto-backup-${new Date().toISOString().split('T')[0]}.json`);
@@ -77,7 +77,7 @@ export async function performAutoBackup(store: any): Promise<boolean> {
     }
 }
 
-export function initAutoBackup(store: any): void {
+export function initAutoBackup(store: ExportDataStore): void {
     // Check on app load
     if (shouldBackupNow()) {
         performAutoBackup(store);

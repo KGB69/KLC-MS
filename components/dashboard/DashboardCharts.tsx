@@ -3,11 +3,10 @@ import {
     PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,
     BarChart, Bar, XAxis, YAxis, CartesianGrid
 } from 'recharts';
-import { IndexedDBProspectDataStore } from '../../services/indexedDBProspectStore';
-import { Prospect, Class, ServiceType } from '../../types';
+import { Prospect, Class, ServiceType, ProspectDataStore, ClassDataStore } from '../../types';
 
 interface DashboardChartsProps {
-    prospectStore: IndexedDBProspectDataStore;
+    prospectStore: ProspectDataStore & ClassDataStore;
     selectedTab: 'prospects' | 'students' | 'classes';
 }
 

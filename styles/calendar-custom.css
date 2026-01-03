@@ -1,0 +1,62 @@
+/* Custom styles for react-big-calendar to improve timetable layout */
+
+/* Make time slots taller for better readability */
+.rbc-time-slot {
+    min-height: 50px !important;
+}
+
+.rbc-time-content {
+    min-height: 600px;
+}
+
+/* Better event styling - less squished */
+.rbc-event {
+    padding: 6px 8px !important;
+    font-size: 0.875rem !important;
+    line-height: 1.3 !important;
+    border-radius: 4px;
+}
+
+.rbc-event-label {
+    font-size: 0.75rem !important;
+    margin-bottom: 2px;
+}
+
+.rbc-event-content {
+    white-space: normal !important;
+    word-wrap: break-word;
+}
+
+/* Make day column headers more prominent */
+.rbc-header {
+    padding: 12px 8px !important;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* Time gutter styling */
+.rbc-time-gutter {
+    width: 80px !important;
+    font-size: 0.85rem;
+}
+
+/* Current time indicator */
+.rbc-current-time-indicator {
+    background-color: #ef4444;
+    height: 2px;
+}
+
+/* Make the calendar container take full height */
+.rbc-calendar {
+    min-height: 700px;
+}
+
+/* Better spacing for week view */
+.rbc-time-column {
+    min-width: 120px;
+}
+
+/* Improve allDay row */
+.rbc-allday-cell {
+    min-height: 40px;
+}

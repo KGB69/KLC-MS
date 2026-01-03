@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS follow_up_actions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     prospect_id UUID REFERENCES prospects(id) ON DELETE CASCADE,
     due_date DATE NOT NULL,
-    assigned_to UUID REFERENCES users(id),
+    assigned_to TEXT,
     notes TEXT,
     status TEXT DEFAULT 'Pending',
     outcome TEXT,
@@ -93,6 +93,7 @@ CREATE TABLE IF NOT EXISTS classes (
     language TEXT NOT NULL,
     level TEXT NOT NULL,
     teacher_id TEXT,
+    room_number TEXT,
     created_by UUID REFERENCES users(id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

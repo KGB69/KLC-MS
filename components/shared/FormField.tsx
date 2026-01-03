@@ -3,7 +3,7 @@ import React from 'react';
 interface FormFieldProps {
     label: string;
     name: string;
-    type?: 'text' | 'email' | 'tel' | 'date' | 'number';
+    type?: 'text' | 'email' | 'tel' | 'date' | 'number' | 'password';
     value: string | number;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     placeholder?: string;

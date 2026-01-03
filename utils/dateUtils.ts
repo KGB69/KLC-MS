@@ -39,7 +39,37 @@ export function formatDateForInput(date: any): string {
     }
 }
 
-// Utility function to get today's date in YYYY-MM-DD format
+// Utility function to get today's date in YYYY-MM-DD format (timezone-safe)
 export function getTodayDate(): string {
-    return new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+// Utility function to format a date for display (e.g., "Jan 15, 2024")
+export function formatDateForDisplay(dateString: string | null | undefined): string {
+    if (!dateString) return 'N/A';
+
+    try {
+        // Parse YYYY-MM-DD format
+        const [year, month, day] = dateString.split('-').map(Number);
+
+        // Create date using local timezone (no UTC conversion)
+        const date = new Date(year, month - 1, day);
+
+        // Check if valid
+        if (isNaN(date.getTime())) return dateString;
+
+        // Format as localized string
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    } catch (error) {
+        console.error('Error formatting date for display:', error);
+        return dateString;
+    }
 }

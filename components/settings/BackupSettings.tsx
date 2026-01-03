@@ -6,10 +6,10 @@ import {
     performAutoBackup,
     BackupInterval
 } from '../../services/backupScheduler';
-import { IndexedDBProspectDataStore } from '../../services/indexedDBProspectStore';
+import { ProspectDataStore, StudentDataStore, ClassDataStore, PaymentDataStore, ExpenditureDataStore } from '../../types';
 
 interface BackupSettingsProps {
-    prospectStore: IndexedDBProspectDataStore;
+    prospectStore: ProspectDataStore & StudentDataStore & ClassDataStore & PaymentDataStore & ExpenditureDataStore;
 }
 
 const BackupSettings: React.FC<BackupSettingsProps> = ({ prospectStore }) => {

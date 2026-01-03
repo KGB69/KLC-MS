@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { FollowUpAction, FollowUpStatus, Prospect, Communication, CommunicationType, CommunicationPriority, CommunicationFormData } from '../../types';
-import { IndexedDBProspectDataStore } from '../../services/indexedDBProspectStore';
+import { FollowUpAction, FollowUpStatus, Prospect, Communication, CommunicationType, CommunicationPriority, CommunicationFormData, ProspectDataStore } from '../../types';
 import CommunicationForm from '../communications/CommunicationForm';
 import Modal from '../shared/Modal';
 import TimeFilter from '../shared/TimeFilter';
 import { filterDataByTime, TimeFilterType, CustomDateRange } from '../../utils/dateFilters';
 
 interface CommunicationsViewProps {
-    prospectStore: IndexedDBProspectDataStore;
+    prospectStore: ProspectDataStore;
 }
 
 type FilterType = 'all' | 'prospect' | 'general' | 'pending' | 'completed';
@@ -177,8 +176,13 @@ const CommunicationsView: React.FC<CommunicationsViewProps> = ({ prospectStore }
 
     const filteredItems = items.filter(item => {
         if (filter === 'all') return true;
-        if (filter === 'prospect') return item.itemType === 'followup';
-        if (filter === 'general') return item.itemType === 'communication';
+        if (filter === 'prospect') {
+            return item.itemType === 'followup' ||
+                (item.itemType === 'communication' && item.type === CommunicationType.ProspectFollowUp);
+        }
+        if (filter === 'general') {
+            return item.itemType === 'communication' && item.type === CommunicationType.General;
+        }
         if (filter === 'pending') return item.status === FollowUpStatus.Pending;
         if (filter === 'completed') return item.status === FollowUpStatus.Completed;
         return true;

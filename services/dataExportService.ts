@@ -1,5 +1,7 @@
 import { getCurrentUserInfo } from './userAttributionService';
-import type { Prospect, Student, Class, Payment, Expenditure } from '../types';
+import type { Prospect, Student, Class, Payment, Expenditure, ProspectDataStore, StudentDataStore, ClassDataStore, PaymentDataStore, ExpenditureDataStore } from '../types';
+
+export type ExportDataStore = ProspectDataStore & StudentDataStore & ClassDataStore & PaymentDataStore & ExpenditureDataStore;
 
 export interface ExportMetadata {
     exportDate: string;
@@ -20,7 +22,7 @@ export interface ExportData {
     };
 }
 
-export async function exportAllData(store: any): Promise<ExportData> {
+export async function exportAllData(store: ExportDataStore): Promise<ExportData> {
     const userInfo = await getCurrentUserInfo();
 
     // Get all data from IndexedDB

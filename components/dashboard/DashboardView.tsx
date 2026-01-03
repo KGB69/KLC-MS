@@ -6,10 +6,10 @@ import UpcomingSchedule from './UpcomingSchedule';
 import DashboardCharts from './DashboardCharts';
 import TasksWidget from './TasksWidget';
 
-type ActiveView = 'dashboard' | 'prospects' | 'clients' | 'classes' | 'conversions' | 'finance' | 'settings' | 'communications';
+import { ActiveView, ProspectDataStore, StudentDataStore, ClassDataStore, PaymentDataStore, ExpenditureDataStore } from '../../types';
 
 interface DashboardViewProps {
-    prospectStore: ApiProspectDataStore;
+    prospectStore: ProspectDataStore & StudentDataStore & ClassDataStore & PaymentDataStore & ExpenditureDataStore;
     onNavigate: (view: ActiveView) => void;
 }
 

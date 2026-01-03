@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { IndexedDBProspectDataStore } from '../../services/indexedDBProspectStore';
 import { ProspectStatus, ContactMethod, ServiceType, Prospect, Payment, Expenditure, ExpenditureCategory } from '../../types';
 import GaugeChart from './GaugeChart';
 import { TimeFilterType, CustomDateRange, filterDataByTime } from '../../utils/dateFilters';
 
-type ActiveView = 'dashboard' | 'prospects' | 'clients' | 'classes' | 'conversions' | 'finance' | 'settings' | 'communications';
+import { ActiveView, ProspectDataStore, StudentDataStore, ClassDataStore, PaymentDataStore, ExpenditureDataStore } from '../../types';
 
 interface MetricCardProps {
-    prospectStore: IndexedDBProspectDataStore;
+    prospectStore: ProspectDataStore & StudentDataStore & ClassDataStore & PaymentDataStore & ExpenditureDataStore;
     onNavigate?: (view: ActiveView) => void;
 }
 
@@ -180,7 +179,7 @@ const MetricCards: React.FC<MetricCardProps> = ({ prospectStore, onNavigate }) =
 
     if (isLoading) {
         return (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                 {[1, 2, 3].map((i) => (
                     <div key={i} className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 animate-pulse">
                         <div className="h-64"></div>
@@ -191,9 +190,9 @@ const MetricCards: React.FC<MetricCardProps> = ({ prospectStore, onNavigate }) =
     }
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-            <h2 className="text-lg font-bold text-slate-800 mb-4">Dashboard Metrics</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:divide-x divide-y sm:divide-y-0 divide-slate-200">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h2 className="text-lg font-bold text-slate-800 mb-6">Dashboard Metrics</h2>
+            <div className="metrics-grid">
                 {/* Prospects Gauge */}
                 <GaugeChart
                     title="Prospects"
@@ -210,7 +209,7 @@ const MetricCards: React.FC<MetricCardProps> = ({ prospectStore, onNavigate }) =
                 />
 
                 {/* Receipts/Expenditures Gauge with Toggle */}
-                <div className="relative pt-6 sm:pt-0">
+                <div className="relative metrics-item-padding">
                     {/* Header with Toggle and Finance Button */}
                     <div className="flex items-center justify-center gap-2 mb-3">
                         <button
@@ -270,19 +269,21 @@ const MetricCards: React.FC<MetricCardProps> = ({ prospectStore, onNavigate }) =
                 </div>
 
                 {/* Services Gauge */}
-                <GaugeChart
-                    title="Services"
-                    value={servicesMetrics.total}
-                    maxValue={Math.max(20, servicesMetrics.total * 1.2)}
-                    percentageChange={servicesMetrics.percentageChange}
-                    categories={servicesMetrics.categories}
-                    timeFilter={servicesTimeFilter}
-                    onTimeFilterChange={(filter, range) => {
-                        setServicesTimeFilter(filter);
-                        if (range) setServicesCustomRange(range);
-                    }}
-                    customRange={servicesCustomRange}
-                />
+                <div className="metrics-item-padding">
+                    <GaugeChart
+                        title="Services"
+                        value={servicesMetrics.total}
+                        maxValue={Math.max(50, servicesMetrics.total * 1.2)}
+                        percentageChange={servicesMetrics.percentageChange}
+                        categories={servicesMetrics.categories}
+                        timeFilter={servicesTimeFilter}
+                        onTimeFilterChange={(filter, range) => {
+                            setServicesTimeFilter(filter);
+                            if (range) setServicesCustomRange(range);
+                        }}
+                        customRange={servicesCustomRange}
+                    />
+                </div>
             </div>
         </div>
     );

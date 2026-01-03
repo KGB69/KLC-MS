@@ -120,6 +120,24 @@ export class IndexedDBProspectDataStore implements ProspectDataStore, StudentDat
     });
   }
 
+  async addProspectWithId(id: string, prospectData: Prospect): Promise<Prospect> {
+    const store = await this.getStore(PROSPECT_STORE_NAME, 'readwrite');
+    const newProspect: Prospect = {
+      ...prospectData,
+      id: id,
+    };
+
+    return new Promise((resolve, reject) => {
+      const request = store.add(newProspect);
+      request.onsuccess = () => {
+        const event = new CustomEvent('prospectCreated', { detail: newProspect, bubbles: true, composed: true });
+        document.dispatchEvent(event);
+        resolve(newProspect);
+      };
+      request.onerror = () => reject('Failed to add prospect with ID.');
+    });
+  }
+
   async getProspect(id: string): Promise<Prospect | undefined> {
     const store = await this.getStore(PROSPECT_STORE_NAME, 'readonly');
     return new Promise((resolve, reject) => {

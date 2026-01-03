@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
+import { PaymentDataStore, ExpenditureDataStore } from '../types';
 import PaymentManagement from './PaymentManagement';
 import ExpenditureManagement from './ExpenditureManagement';
 
 type FinanceSubView = 'payments' | 'expenditures';
 
 interface FinanceManagementProps {
-  dataStore: any;
+  dataStore: PaymentDataStore & ExpenditureDataStore;
 }
 
 const FinanceManagement: React.FC<FinanceManagementProps> = ({ dataStore }) => {
@@ -15,8 +16,8 @@ const FinanceManagement: React.FC<FinanceManagementProps> = ({ dataStore }) => {
     <button
       onClick={() => setSubView(view)}
       className={`px-4 py-2 text-sm font-semibold rounded-md transition-colors duration-200 ${subView === view
-          ? 'bg-brand-primary text-white'
-          : 'text-slate-600 bg-white hover:bg-slate-100'
+        ? 'bg-brand-primary text-white'
+        : 'text-slate-600 bg-white hover:bg-slate-100'
         }`}
     >
       {label}

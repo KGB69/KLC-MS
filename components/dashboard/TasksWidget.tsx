@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { FollowUpAction, FollowUpStatus, Communication, CommunicationType } from '../../types';
-import { IndexedDBProspectDataStore } from '../../services/indexedDBProspectStore';
+import { FollowUpAction, FollowUpStatus, Communication, CommunicationType, ProspectDataStore } from '../../types';
 
 interface TasksWidgetProps {
-    prospectStore: IndexedDBProspectDataStore;
+    prospectStore: ProspectDataStore;
     onViewAll: () => void;
 }
 

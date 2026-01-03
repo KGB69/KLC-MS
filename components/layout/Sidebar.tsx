@@ -1,6 +1,4 @@
-import React from 'react';
-
-type ActiveView = 'dashboard' | 'prospects' | 'clients' | 'classes' | 'conversions' | 'finance' | 'settings' | 'communications';
+import { ActiveView } from '../../types';
 
 interface SidebarProps {
     activeView: ActiveView;
