@@ -628,6 +628,25 @@ app.get(/^\/(?!api).*/, (req: Request, res: Response) => {
     res.sendFile(path.join(__dirname, '../../dist/index.html'));
 });
 
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-});
+// --- Database Migrations ---
+const runMigrations = async () => {
+    try {
+        console.log('Running database migrations...');
+        await query('ALTER TABLE classes ADD COLUMN IF NOT EXISTS room_number TEXT');
+        console.log('✅ Migration successful: room_number column verified');
+    } catch (err) {
+        console.error('❌ Migration failed:', err);
+        // Don't exit, might be a transient error or column exists
+    }
+};
+
+// Start server
+const startServer = async () => {
+    await runMigrations();
+
+    app.listen(port, () => {
+        console.log(`Server running on port ${port}`);
+    });
+};
+
+startServer();
