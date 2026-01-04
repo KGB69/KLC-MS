@@ -643,11 +643,15 @@ const runMigrations = async () => {
         await query('ALTER TABLE follow_up_actions ALTER COLUMN assigned_to TYPE TEXT');
 
         // 3. Ensure fees column exists in students (for balance calculation)
-        await query('ALTER TABLE students ADD COLUMN IF NOT EXISTS fees NUMERIC');
+        await query('ALTER TABLE students ADD COLUMN IF NOT EXISTS fees NUMERIC DEFAULT 0');
+        await query('UPDATE students SET fees = 0 WHERE fees IS NULL');
 
         // 4. Ensure fee columns exist in prospects (for balance calculation)
-        await query('ALTER TABLE prospects ADD COLUMN IF NOT EXISTS translation_total_fee NUMERIC');
-        await query('ALTER TABLE prospects ADD COLUMN IF NOT EXISTS interpretation_total_fee NUMERIC');
+        await query('ALTER TABLE prospects ADD COLUMN IF NOT EXISTS translation_total_fee NUMERIC DEFAULT 0');
+        await query('UPDATE prospects SET translation_total_fee = 0 WHERE translation_total_fee IS NULL');
+
+        await query('ALTER TABLE prospects ADD COLUMN IF NOT EXISTS interpretation_total_fee NUMERIC DEFAULT 0');
+        await query('UPDATE prospects SET interpretation_total_fee = 0 WHERE interpretation_total_fee IS NULL');
 
         console.log('✅ Migrations successful');
     } catch (err) {
