@@ -9,22 +9,31 @@ import { query } from './db.js';
 
 dotenv.config();
 
-const toCamel = (obj: any): any => {
+const toCamel = (obj: any, parentKey: string = ''): any => {
     if (obj === null || obj === undefined) {
         return obj;
     }
 
-    // Handle Date objects - convert to YYYY-MM-DD format (timezone-safe)
+    // Handle Date objects - preserve full timestamp for timestamp fields, date-only for date fields
     if (obj instanceof Date) {
-        const year = obj.getFullYear();
-        const month = String(obj.getMonth() + 1).padStart(2, '0');
-        const day = String(obj.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
+        // Fields that should be date-only (YYYY-MM-DD)
+        const dateOnlyFields = ['due_date', 'birth_date', 'date_of_birth', 'start_date', 'end_date'];
+
+        if (dateOnlyFields.includes(parentKey.toLowerCase())) {
+            // Date-only field - return YYYY-MM-DD
+            const year = obj.getFullYear();
+            const month = String(obj.getMonth() + 1).padStart(2, '0');
+            const day = String(obj.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        } else {
+            // Timestamp field - return full ISO string
+            return obj.toISOString();
+        }
     }
 
     // Handle arrays
     if (Array.isArray(obj)) {
-        return obj.map(toCamel);
+        return obj.map(item => toCamel(item, parentKey));
     }
 
     // Handle non-object primitives
@@ -36,7 +45,7 @@ const toCamel = (obj: any): any => {
     const n: any = {};
     Object.keys(obj).forEach(k => {
         const camelKey = k.replace(/(_\w)/g, (m: string) => m[1].toUpperCase());
-        n[camelKey] = toCamel((obj as any)[k]);
+        n[camelKey] = toCamel((obj as any)[k], k); // Pass original snake_case key
     });
     return n;
 };
