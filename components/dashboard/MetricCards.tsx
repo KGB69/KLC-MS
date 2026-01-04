@@ -228,13 +228,13 @@ const MetricCards: React.FC<MetricCardProps> = ({ prospectStore, onNavigate }) =
                                 <div className="flex items-center gap-2">
                                     <button
                                         onClick={() => setShowExpenditures(!showExpenditures)}
-                                        className="flex items-center gap-2 px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                                        className="flex items-center gap-1.5 px-2 py-1 bg-slate-100 border border-slate-200 rounded text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                                        title="Switch to Expenditures"
                                     >
-                                        <span className="text-brand-primary font-semibold">Receipts</span>
-                                        <div className="relative w-7 h-3.5 bg-slate-200 rounded-full">
-                                            <div className="absolute top-0.5 left-0.5 w-2.5 h-2.5 bg-brand-primary rounded-full transition-transform" />
-                                        </div>
-                                        <span className="text-slate-500">Expenditures</span>
+                                        <span className="text-brand-primary">💰</span>
+                                        <svg className="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                        </svg>
                                     </button>
                                     {onNavigate && (
                                         <button
@@ -268,13 +268,13 @@ const MetricCards: React.FC<MetricCardProps> = ({ prospectStore, onNavigate }) =
                                 <div className="flex items-center gap-2">
                                     <button
                                         onClick={() => setShowExpenditures(!showExpenditures)}
-                                        className="flex items-center gap-2 px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                                        className="flex items-center gap-1.5 px-2 py-1 bg-slate-100 border border-slate-200 rounded text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                                        title="Switch to Receipts"
                                     >
-                                        <span className="text-slate-500">Receipts</span>
-                                        <div className="relative w-7 h-3.5 bg-slate-200 rounded-full">
-                                            <div className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-brand-primary rounded-full transition-transform translate-x-3.5" />
-                                        </div>
-                                        <span className="text-brand-primary font-semibold">Expenditures</span>
+                                        <span className="text-red-500">📤</span>
+                                        <svg className="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                        </svg>
                                     </button>
                                     {onNavigate && (
                                         <button
@@ -286,7 +286,7 @@ const MetricCards: React.FC<MetricCardProps> = ({ prospectStore, onNavigate }) =
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                             </svg>
                                         </button>
-                                    )}
+                                    )
                                 </div>
                             )}
                         />
