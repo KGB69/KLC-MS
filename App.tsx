@@ -121,6 +121,7 @@ const App: React.FC = () => {
 
 
   const fetchProspects = useCallback(async () => {
+    if (!user) return; // Prevent fetching if not authenticated
     setIsLoading(true);
     setError(null);
     try {
@@ -141,6 +142,7 @@ const App: React.FC = () => {
   }, [prospectStore, filters]);
 
   const seedInitialData = useCallback(async () => {
+    if (!user) return; // Prevent seeding if not authenticated
     try {
       const existingProspects = await prospectStore.searchProspects({
         searchTerm: '', // For seeding, we want to check all prospects, not filtered ones

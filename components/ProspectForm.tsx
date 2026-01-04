@@ -59,6 +59,8 @@ const ProspectForm: React.FC<ProspectFormProps> = ({ onSubmit, initialData, onCa
                 translationTargetLanguage: translationTargetLanguage || '',
                 interpretationSourceLanguage: interpretationSourceLanguage || '',
                 interpretationTargetLanguage: interpretationTargetLanguage || '',
+                translationTotalFee: initialData.translationTotalFee || 0,
+                interpretationTotalFee: initialData.interpretationTotalFee || 0,
             };
 
             if (serviceInterestedIn === ServiceType.LanguageTraining && trainingLanguages) {
@@ -120,10 +122,12 @@ const ProspectForm: React.FC<ProspectFormProps> = ({ onSubmit, initialData, onCa
             case ServiceType.DocTranslation:
                 submissionData.translationSourceLanguage = formData.translationSourceLanguage;
                 submissionData.translationTargetLanguage = formData.translationTargetLanguage;
+                submissionData.translationTotalFee = formData.translationTotalFee;
                 break;
             case ServiceType.Interpretation:
                 submissionData.interpretationSourceLanguage = formData.interpretationSourceLanguage;
                 submissionData.interpretationTargetLanguage = formData.interpretationTargetLanguage;
+                submissionData.interpretationTotalFee = formData.interpretationTotalFee;
                 break;
         }
 
@@ -260,6 +264,35 @@ const ProspectForm: React.FC<ProspectFormProps> = ({ onSubmit, initialData, onCa
             <div className="border-t border-slate-100 pt-4">
                 <h3 className="text-sm font-semibold text-slate-500 mb-3 uppercase tracking-wider">Service Details</h3>
                 {renderServiceSpecificFields()}
+
+                {/* Financial Fields for Translation/Interpretation */}
+                {formData.serviceInterestedIn === ServiceType.DocTranslation && (
+                    <div className="mt-4">
+                        <FormField
+                            label="Total Translation Fee (UGX)"
+                            name="translationTotalFee"
+                            type="number"
+                            value={formData.translationTotalFee || 0}
+                            onChange={handleChange}
+                            min="0"
+                            step="1000"
+                        />
+                    </div>
+                )}
+
+                {formData.serviceInterestedIn === ServiceType.Interpretation && (
+                    <div className="mt-4">
+                        <FormField
+                            label="Total Interpretation Fee (UGX)"
+                            name="interpretationTotalFee"
+                            type="number"
+                            value={formData.interpretationTotalFee || 0}
+                            onChange={handleChange}
+                            min="0"
+                            step="1000"
+                        />
+                    </div>
+                )}
             </div>
 
             {/* Notes */}

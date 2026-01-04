@@ -309,6 +309,10 @@ export interface ProspectFormData {
   translationTargetLanguage?: string;
   interpretationSourceLanguage?: string;
   interpretationTargetLanguage?: string;
+
+  // Financial fields
+  translationTotalFee?: number;
+  interpretationTotalFee?: number;
 }
 
 export interface StudentFormData {

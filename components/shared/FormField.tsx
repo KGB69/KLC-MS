@@ -12,6 +12,9 @@ interface FormFieldProps {
     helpText?: string;
     className?: string;
     list?: string;
+    min?: string | number;
+    max?: string | number;
+    step?: string | number;
 }
 
 const FormField: React.FC<FormFieldProps> = ({
@@ -26,6 +29,9 @@ const FormField: React.FC<FormFieldProps> = ({
     helpText,
     className = '',
     list,
+    min,
+    max,
+    step,
 }) => {
     return (
         <div className={`form-group ${className}`}>
@@ -45,6 +51,9 @@ const FormField: React.FC<FormFieldProps> = ({
                 placeholder={placeholder}
                 required={required}
                 list={list}
+                min={min}
+                max={max}
+                step={step}
                 className={`w-full px-3 py-2 bg-white border rounded-md shadow-sm focus:outline-none focus:ring-brand-primary focus:border-brand-primary transition-colors ${error ? 'border-red-500 focus:ring-red-500' : 'border-slate-300'
                     }`}
             />
