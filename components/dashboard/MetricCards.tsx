@@ -208,33 +208,8 @@ const MetricCards: React.FC<MetricCardProps> = ({ prospectStore, onNavigate }) =
                     customRange={prospectsCustomRange}
                 />
 
-                {/* Receipts/Expenditures Gauge with Toggle */}
+                {/* Receipts/Expenditures Gauge with Integrated Toggle */}
                 <div className="relative metrics-item-padding">
-                    {/* Header with Toggle and Finance Button */}
-                    <div className="flex items-center justify-center gap-2 mb-3">
-                        <button
-                            onClick={() => setShowExpenditures(!showExpenditures)}
-                            className="flex items-center gap-2 px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
-                        >
-                            <span className={!showExpenditures ? 'text-brand-primary font-semibold' : 'text-slate-500'}>Receipts</span>
-                            <div className="relative w-7 h-3.5 bg-slate-200 rounded-full">
-                                <div className={`absolute top-0.5 left-0.5 w-2.5 h-2.5 bg-brand-primary rounded-full transition-transform ${showExpenditures ? 'translate-x-3.5' : ''}`} />
-                            </div>
-                            <span className={showExpenditures ? 'text-brand-primary font-semibold' : 'text-slate-500'}>Expenditures</span>
-                        </button>
-                        {onNavigate && (
-                            <button
-                                onClick={() => onNavigate('finance')}
-                                className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-slate-600 hover:text-brand-primary hover:bg-slate-50 border border-slate-200 rounded-md transition-colors"
-                                title="View Finance Details"
-                            >
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                </svg>
-                            </button>
-                        )}
-                    </div>
-
                     {!showExpenditures ? (
                         <GaugeChart
                             title="Receipts"
@@ -249,6 +224,31 @@ const MetricCards: React.FC<MetricCardProps> = ({ prospectStore, onNavigate }) =
                             }}
                             customRange={receiptsCustomRange}
                             currency={receiptsMetrics.currency}
+                            headerActions={(
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => setShowExpenditures(!showExpenditures)}
+                                        className="flex items-center gap-2 px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                                    >
+                                        <span className="text-brand-primary font-semibold">Receipts</span>
+                                        <div className="relative w-7 h-3.5 bg-slate-200 rounded-full">
+                                            <div className="absolute top-0.5 left-0.5 w-2.5 h-2.5 bg-brand-primary rounded-full transition-transform" />
+                                        </div>
+                                        <span className="text-slate-500">Expenditures</span>
+                                    </button>
+                                    {onNavigate && (
+                                        <button
+                                            onClick={() => onNavigate('finance')}
+                                            className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-slate-600 hover:text-brand-primary hover:bg-slate-50 border border-slate-200 rounded-md transition-colors"
+                                            title="View Finance Details"
+                                        >
+                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                            </svg>
+                                        </button>
+                                    )}
+                                </div>
+                            )}
                         />
                     ) : (
                         <GaugeChart
@@ -264,10 +264,36 @@ const MetricCards: React.FC<MetricCardProps> = ({ prospectStore, onNavigate }) =
                             }}
                             customRange={receiptsCustomRange}
                             currency={expendituresMetrics.currency}
+                            headerActions={(
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => setShowExpenditures(!showExpenditures)}
+                                        className="flex items-center gap-2 px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                                    >
+                                        <span className="text-slate-500">Receipts</span>
+                                        <div className="relative w-7 h-3.5 bg-slate-200 rounded-full">
+                                            <div className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-brand-primary rounded-full transition-transform translate-x-3.5" />
+                                        </div>
+                                        <span className="text-brand-primary font-semibold">Expenditures</span>
+                                    </button>
+                                    {onNavigate && (
+                                        <button
+                                            onClick={() => onNavigate('finance')}
+                                            className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-slate-600 hover:text-brand-primary hover:bg-slate-50 border border-slate-200 rounded-md transition-colors"
+                                            title="View Finance Details"
+                                        >
+                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                            </svg>
+                                        </button>
+                                    )}
+                                </div>
+                            )}
                         />
                     )}
                 </div>
 
+                {/* Services Distribution */}
                 {/* Services Gauge */}
                 <div className="metrics-item-padding">
                     <GaugeChart
@@ -285,7 +311,7 @@ const MetricCards: React.FC<MetricCardProps> = ({ prospectStore, onNavigate }) =
                     />
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

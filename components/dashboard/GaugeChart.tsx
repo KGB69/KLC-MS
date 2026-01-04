@@ -19,6 +19,7 @@ interface GaugeChartProps {
     onTimeFilterChange: (filter: TimeFilterType, range?: CustomDateRange) => void;
     customRange?: CustomDateRange;
     currency?: string;
+    headerActions?: React.ReactNode;
 }
 
 const GaugeChart: React.FC<GaugeChartProps> = ({
@@ -30,7 +31,8 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
     timeFilter,
     onTimeFilterChange,
     customRange,
-    currency
+    currency,
+    headerActions
 }) => {
     const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -103,6 +105,14 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
 
     return (
         <div className="px-3 relative">
+            {/* Header with Title and Optional Actions */}
+            {(title || headerActions) && (
+                <div className="flex items-center justify-between mb-2">
+                    {title && <h3 className="text-sm font-semibold text-slate-700">{title}</h3>}
+                    {headerActions}
+                </div>
+            )}
+
             {/* Compact Time Filter with Calendar */}
             <div className="flex items-center justify-end gap-1 text-xs mb-2">
                 {timeFilters.map(({ label, value: filterValue }) => (
