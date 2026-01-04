@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { UserSession } from '../../types';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, differenceInSeconds } from 'date-fns';
 
 interface SessionManagementProps {
     dataStore: any; // ApiProspectDataStore has session methods not in interface
@@ -10,6 +10,7 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ dataStore }) => {
     const [sessions, setSessions] = useState<UserSession[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [currentTime, setCurrentTime] = useState(new Date());
 
     const fetchSessions = async () => {
         setIsLoading(true);
@@ -27,6 +28,11 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ dataStore }) => {
 
     useEffect(() => {
         fetchSessions();
+        // Update current time every second for real-time duration display
+        const timer = setInterval(() => {
+            setCurrentTime(new Date());
+        }, 1000);
+        return () => clearInterval(timer);
     }, []);
 
     const handleRevokeSession = async (sessionId: string) => {
@@ -36,7 +42,7 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ dataStore }) => {
 
         try {
             await dataStore.revokeSession(sessionId);
-            await fetchSessions(); // Refresh list
+            await fetchSessions();
         } catch (err) {
             console.error('Failed to revoke session:', err);
             alert('Failed to revoke session');
@@ -50,7 +56,7 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ dataStore }) => {
 
         try {
             await dataStore.revokeAllOtherSessions();
-            await fetchSessions(); // Refresh list
+            await fetchSessions();
         } catch (err) {
             console.error('Failed to revoke sessions:', err);
             alert('Failed to revoke sessions');
@@ -68,14 +74,24 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ dataStore }) => {
         return '🖥️';
     };
 
+    const formatActiveDuration = (lastActive: string) => {
+        const seconds = differenceInSeconds(currentTime, new Date(lastActive));
+        if (seconds < 60) return `${seconds}s ago`;
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes}m ago`;
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        return `${hours}h ${mins}m ago`;
+    };
+
     if (isLoading) {
         return (
             <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-semibold text-slate-800 mb-4">Active Sessions</h2>
-                <div className="animate-pulse space-y-4">
-                    {[1, 2, 3].map(i => (
-                        <div key={i} className="h-20 bg-slate-100 rounded"></div>
-                    ))}
+                <div className="animate-pulse">
+                    <div className="h-10 bg-slate-200 rounded mb-2"></div>
+                    <div className="h-16 bg-slate-100 rounded mb-2"></div>
+                    <div className="h-16 bg-slate-100 rounded"></div>
                 </div>
             </div>
         );
@@ -90,94 +106,110 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ dataStore }) => {
         );
     }
 
-    const currentSession = sessions.find(s => s.isCurrent);
     const otherSessions = sessions.filter(s => !s.isCurrent);
 
     return (
         <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-slate-800">Active Sessions</h2>
+            <div className="flex items-center justify-between mb-4">
+                <div>
+                    <h2 className="text-xl font-semibold text-slate-800">Active Sessions</h2>
+                    <p className="text-sm text-slate-600 mt-1">
+                        {sessions.length} active {sessions.length === 1 ? 'session' : 'sessions'}
+                        {sessions.length > 1 && ' • Times update in real-time'}
+                    </p>
+                </div>
                 {otherSessions.length > 0 && (
                     <button
                         onClick={handleRevokeAllOthers}
                         className="px-4 py-2 text-sm font-medium text-red-700 bg-red-50 rounded-md hover:bg-red-100 transition-colors"
                     >
-                        Revoke All Other Sessions
+                        Revoke All Others ({otherSessions.length})
                     </button>
                 )}
             </div>
 
-            <div className="space-y-4">
-                {/* Current Session */}
-                {currentSession && (
-                    <div className="border-2 border-green-200 bg-green-50 rounded-lg p-4">
-                        <div className="flex items-start justify-between">
-                            <div className="flex items-start space-x-3">
-                                <span className="text-3xl">{getDeviceIcon(currentSession.deviceName)}</span>
-                                <div>
-                                    <div className="flex items-center space-x-2">
-                                        <h3 className="font-semibold text-slate-800">{currentSession.deviceName}</h3>
-                                        <span className="px-2 py-0.5 text-xs font-medium text-green-700 bg-green-100 rounded-full">
-                                            ✓ This Device
-                                        </span>
-                                    </div>
-                                    <p className="text-sm text-slate-600 mt-1">
-                                        {currentSession.browser} • {currentSession.os}
-                                    </p>
-                                    <p className="text-xs text-slate-500 mt-1">
-                                        IP: {currentSession.ipAddress}
-                                    </p>
-                                    <p className="text-xs text-green-600 font-medium">
-                                        ⚡ Active now (viewing this page)
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Other Sessions */}
-                {otherSessions.map(session => (
-                    <div key={session.id} className="border border-slate-200 rounded-lg p-4 hover:border-slate-300 transition-colors">
-                        <div className="flex items-start justify-between">
-                            <div className="flex items-start space-x-3">
-                                <span className="text-3xl">{getDeviceIcon(session.deviceName)}</span>
-                                <div>
-                                    <h3 className="font-semibold text-slate-800">{session.deviceName}</h3>
-                                    <p className="text-sm text-slate-600 mt-1">
+            {sessions.length === 0 ? (
+                <div className="text-center py-8 text-slate-500">
+                    No active sessions found
+                </div>
+            ) : (
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead>
+                            <tr className="border-b border-slate-200">
+                                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Device</th>
+                                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Browser & OS</th>
+                                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">IP Address</th>
+                                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Last Activity</th>
+                                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Status</th>
+                                <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {sessions.map(session => (
+                                <tr
+                                    key={session.id}
+                                    className={`border-b border-slate-100 hover:bg-slate-50 transition-colors ${session.isCurrent ? 'bg-green-50' : ''
+                                        }`}
+                                >
+                                    <td className="py-3 px-4">
+                                        <div className="flex items-center space-x-2">
+                                            <span className="text-2xl">{getDeviceIcon(session.deviceName)}</span>
+                                            <span className="font-medium text-slate-800">{session.deviceName}</span>
+                                        </div>
+                                    </td>
+                                    <td className="py-3 px-4 text-sm text-slate-600">
                                         {session.browser} • {session.os}
-                                    </p>
-                                    <p className="text-xs text-slate-500 mt-1">
-                                        IP: {session.ipAddress}
-                                    </p>
-                                    <p className="text-xs text-slate-500">
-                                        Last active {formatDistanceToNow(new Date(session.lastActive), { addSuffix: true })}
-                                    </p>
-                                </div>
-                            </div>
-                            <button
-                                onClick={() => handleRevokeSession(session.id)}
-                                className="px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
-                            >
-                                Revoke
-                            </button>
-                        </div>
-                    </div>
-                ))}
-
-                {sessions.length === 0 && (
-                    <div className="text-center py-8 text-slate-500">
-                        No active sessions found
-                    </div>
-                )}
-            </div>
+                                    </td>
+                                    <td className="py-3 px-4 text-sm text-slate-500 font-mono">
+                                        {session.ipAddress}
+                                    </td>
+                                    <td className="py-3 px-4">
+                                        <div className="text-sm">
+                                            {session.isCurrent ? (
+                                                <span className="text-green-600 font-medium">⚡ Active now</span>
+                                            ) : (
+                                                <span className="text-slate-600">{formatActiveDuration(session.lastActive)}</span>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="py-3 px-4">
+                                        {session.isCurrent ? (
+                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                ✓ This Device
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                                                Other Device
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="py-3 px-4 text-right">
+                                        {!session.isCurrent && (
+                                            <button
+                                                onClick={() => handleRevokeSession(session.id)}
+                                                className="px-3 py-1 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+                                            >
+                                                Revoke
+                                            </button>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
 
             <div className="mt-6 pt-6 border-t border-slate-200">
-                <h3 className="text-sm font-semibold text-slate-700 mb-2">About Sessions</h3>
-                <p className="text-sm text-slate-600">
-                    Sessions are created when you log in from a device. Revoking a session will log out that device immediately.
-                    You can't revoke your current session from here - use the Logout button instead.
-                </p>
+                <h3 className="text-sm font-semibold text-slate-700 mb-2">💡 About Sessions</h3>
+                <ul className="text-sm text-slate-600 space-y-1">
+                    <li>• Sessions are created when you log in from a device</li>
+                    <li>• "Last Activity" updates in real-time as you use the app</li>
+                    <li>• Revoking a session logs out that device immediately</li>
+                    <li>• You can't revoke your current session - use Logout instead</li>
+                    <li>• Multiple sessions from the same IP mean you logged in multiple times without logging out</li>
+                </ul>
             </div>
         </div>
     );
