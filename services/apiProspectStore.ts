@@ -488,4 +488,18 @@ export class ApiProspectDataStore implements
     });
     return response.ok;
   }
+
+  // --- Student Methods ---
+
+  async updateStudent(id: string, updates: StudentFormData): Promise<Student | undefined> {
+    const response = await fetch(`${API_BASE_URL}/students/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(updates)
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update student');
+    }
+    return response.json();
+  }
 }
