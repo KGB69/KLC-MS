@@ -84,9 +84,23 @@ const authenticateToken = (req: AuthRequest, res: express.Response, next: expres
 
     if (!token) return res.status(401).json({ message: 'Authentication required' });
 
-    jwt.verify(token, JWT_SECRET, (err: any, user: any) => {
+    jwt.verify(token, JWT_SECRET, async (err: any, user: any) => {
         if (err) return res.status(403).json({ message: 'Invalid or expired token' });
         req.user = user;
+
+        // Update session last_active timestamp
+        if (user.sessionId) {
+            try {
+                await query(
+                    'UPDATE user_sessions SET last_active = CURRENT_TIMESTAMP WHERE id = $1',
+                    [user.sessionId]
+                );
+            } catch (error) {
+                console.error('Failed to update session timestamp:', error);
+                // Don't fail the request if timestamp update fails
+            }
+        }
+
         next();
     });
 };
