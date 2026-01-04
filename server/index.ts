@@ -138,7 +138,7 @@ app.post('/api/auth/register', async (req: Request, res: Response) => {
 });
 
 app.post('/api/auth/login', async (req: Request, res: Response) => {
-    const { email, password } = req.body;
+    const { email, password, deviceDetails } = req.body; // Accept optional deviceDetails from client
     try {
         const result = await query('SELECT * FROM users WHERE email = $1', [email]);
         const user = result.rows[0];
@@ -148,11 +148,54 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
 
         // Parse device information from user-agent  
         const userAgent = req.headers['user-agent'] || '';
-        // Simple parser for common browsers and OS
-        const browserMatch = userAgent.match(/(Chrome|Firefox|Safari|Edge|Opera|MSIE|Trident)/);
-        const osMatch = userAgent.match(/(Windows|Mac OS|Linux|Android|iOS)/);
-        const browser = browserMatch ? browserMatch[1] : 'Unknown Browser';
-        const os = osMatch ? osMatch[1] : 'Unknown OS';
+
+        // Extract browser name and version
+        let browser = 'Unknown Browser';
+        let browserVersion = '';
+        const chromeMatch = userAgent.match(/Chrome\/([\d.]+)/);
+        const firefoxMatch = userAgent.match(/Firefox\/([\d.]+)/);
+        const safariMatch = userAgent.match(/Version\/([\d.]+).*Safari/);
+        const edgeMatch = userAgent.match(/Edg\/([\d.]+)/);
+
+        if (edgeMatch) {
+            browser = 'Edge';
+            browserVersion = edgeMatch[1];
+        } else if (chromeMatch) {
+            browser = 'Chrome';
+            browserVersion = chromeMatch[1];
+        } else if (firefoxMatch) {
+            browser = 'Firefox';
+            browserVersion = firefoxMatch[1];
+        } else if (safariMatch) {
+            browser = 'Safari';
+            browserVersion = safariMatch[1];
+        }
+
+        // Extract OS name and version
+        let os = 'Unknown OS';
+        let osVersion = '';
+        const windowsMatch = userAgent.match(/Windows NT ([\d.]+)/);
+        const macMatch = userAgent.match(/Mac OS X ([\d_]+)/);
+        const linuxMatch = userAgent.match(/Linux/);
+        const androidMatch = userAgent.match(/Android ([\d.]+)/);
+        const iosMatch = userAgent.match(/OS ([\d_]+)/);
+
+        if (windowsMatch) {
+            os = 'Windows';
+            osVersion = windowsMatch[1];
+        } else if (macMatch) {
+            os = 'macOS';
+            osVersion = macMatch[1].replace(/_/g, '.');
+        } else if (androidMatch) {
+            os = 'Android';
+            osVersion = androidMatch[1];
+        } else if (iosMatch) {
+            os = 'iOS';
+            osVersion = iosMatch[1].replace(/_/g, '.');
+        } else if (linuxMatch) {
+            os = 'Linux';
+        }
+
         const deviceName = `${browser} on ${os}`;
         const ipAddress = req.ip || req.socket.remoteAddress || 'unknown';
 
@@ -163,10 +206,12 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
             { expiresIn: '24h' }
         );
 
-        // Create session record
+        // Create session record with verbose device details
         const sessionResult = await query(
-            `INSERT INTO user_sessions (user_id, session_token, device_name, browser, os, ip_address, user_agent)
-             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+            `INSERT INTO user_sessions (
+                user_id, session_token, device_name, browser, os, ip_address, user_agent,
+                browser_version, os_version, screen_resolution, timezone
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
             [
                 user.id,
                 sessionToken,
@@ -174,7 +219,11 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
                 browser,
                 os,
                 ipAddress,
-                userAgent
+                userAgent,
+                browserVersion,
+                osVersion,
+                deviceDetails?.screenResolution || null,
+                deviceDetails?.timezone || null
             ]
         );
         const sessionId = sessionResult.rows[0].id;
@@ -888,9 +937,19 @@ const runMigrations = async () => {
         await query('CREATE INDEX IF NOT EXISTS idx_user_sessions_user_id ON user_sessions(user_id)');
         await query('CREATE INDEX IF NOT EXISTS idx_user_sessions_token ON user_sessions(session_token)');
         await query('CREATE INDEX IF NOT EXISTS idx_user_sessions_active ON user_sessions(is_active)');
-        console.log('✅ Migrations successful');
+        // Add verbose device tracking columns to user_sessions
+        await query(`
+            ALTER TABLE user_sessions 
+            ADD COLUMN IF NOT EXISTS browser_version TEXT,
+            ADD COLUMN IF NOT EXISTS os_version TEXT,
+            ADD COLUMN IF NOT EXISTS screen_resolution TEXT,
+            ADD COLUMN IF NOT EXISTS timezone TEXT,
+            ADD COLUMN IF NOT EXISTS request_count INTEGER DEFAULT 0
+        `);
+
+        console.log('✅ Auto-migrations completed successfully');
     } catch (err) {
-        console.error('❌ Migration failed:', err);
+        console.error('❌ Auto-migration error:', err);
         // Don't exit, might be a transient error
     }
 };
