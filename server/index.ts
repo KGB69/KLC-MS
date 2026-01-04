@@ -632,11 +632,20 @@ app.get(/^\/(?!api).*/, (req: Request, res: Response) => {
 const runMigrations = async () => {
     try {
         console.log('Running database migrations...');
+
+        // 1. Add room_number to classes
         await query('ALTER TABLE classes ADD COLUMN IF NOT EXISTS room_number TEXT');
-        console.log('✅ Migration successful: room_number column verified');
+
+        // 2. Fix assigned_to in follow_up_actions (change from UUID to TEXT)
+        // First drop the FK constraint if it exists
+        await query('ALTER TABLE follow_up_actions DROP CONSTRAINT IF EXISTS follow_up_actions_assigned_to_fkey');
+        // Then change column type
+        await query('ALTER TABLE follow_up_actions ALTER COLUMN assigned_to TYPE TEXT');
+
+        console.log('✅ Migrations successful');
     } catch (err) {
         console.error('❌ Migration failed:', err);
-        // Don't exit, might be a transient error or column exists
+        // Don't exit, might be a transient error
     }
 };
 
