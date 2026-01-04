@@ -84,6 +84,14 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ dataStore }) => {
         return `${hours}h ${mins}m ago`;
     };
 
+    const getSessionStatus = (lastActive: string, isCurrent: boolean) => {
+        if (isCurrent) return 'active';
+        const minutes = Math.floor(differenceInSeconds(currentTime, new Date(lastActive)) / 60);
+        if (minutes < 60) return 'active'; // Active if used in last hour
+        if (minutes < 1440) return 'stale'; // Stale if 1-24 hours
+        return 'inactive'; // Inactive if >24 hours
+    };
+
     if (isLoading) {
         return (
             <div className="bg-white rounded-lg shadow-sm p-6">
@@ -178,11 +186,28 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ dataStore }) => {
                                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                                 ✓ This Device
                                             </span>
-                                        ) : (
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
-                                                Other Device
-                                            </span>
-                                        )}
+                                        ) : (() => {
+                                            const status = getSessionStatus(session.lastActive, session.isCurrent);
+                                            if (status === 'active') {
+                                                return (
+                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                        🟢 Active
+                                                    </span>
+                                                );
+                                            } else if (status === 'stale') {
+                                                return (
+                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                        🟡 Stale
+                                                    </span>
+                                                );
+                                            } else {
+                                                return (
+                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                                                        ⚪ Inactive
+                                                    </span>
+                                                );
+                                            }
+                                        })()}
                                     </td>
                                     <td className="py-3 px-4 text-right">
                                         {!session.isCurrent && (
@@ -206,8 +231,9 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ dataStore }) => {
                 <ul className="text-sm text-slate-600 space-y-1">
                     <li>• Sessions are created when you log in from a device</li>
                     <li>• "Last Activity" updates in real-time as you use the app</li>
+                    <li>• <strong>Status badges:</strong> 🟢 Active (&lt;1h), 🟡 Stale (1-24h), ⚪ Inactive (&gt;24h)</li>
                     <li>• Revoking a session logs out that device immediately</li>
-                    <li>• You can't revoke your current session - use Logout instead</li>
+                    <li>• Logging out properly removes your session from this list</li>
                     <li>• Multiple sessions from the same IP mean you logged in multiple times without logging out</li>
                 </ul>
             </div>

@@ -206,6 +206,25 @@ app.post('/api/auth/refresh', authenticateToken, async (req: AuthRequest, res: R
     }
 });
 
+app.post('/api/auth/logout', authenticateToken, async (req: AuthRequest, res: Response) => {
+    try {
+        const user = req.user;
+        // Revoke current session
+        if (user.sessionId) {
+            await query(
+                `UPDATE user_sessions 
+                 SET is_active = false, revoked_at = CURRENT_TIMESTAMP, revoked_by = $1 
+                 WHERE id = $2`,
+                [user.id, user.sessionId]
+            );
+        }
+        res.json({ message: 'Logged out successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Logout failed' });
+    }
+});
+
 // --- Session Management Endpoints ---
 
 // GET /api/sessions - List user's active sessions

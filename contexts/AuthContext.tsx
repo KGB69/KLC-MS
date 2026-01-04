@@ -6,7 +6,7 @@ interface AuthContextType {
     user: AuthUser | null;
     login: (credentials: LoginCredentials) => Promise<void>;
     register: (data: RegisterData) => Promise<void>;
-    logout: () => void;
+    logout: () => Promise<void>;
     isAuthenticated: boolean;
     isLoading: boolean;
 }
@@ -76,10 +76,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem(AUTH_TOKEN_KEY, token);
     };
 
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem(CURRENT_USER_KEY);
-        localStorage.removeItem(AUTH_TOKEN_KEY);
+    const logout = async () => {
+        try {
+            const token = localStorage.getItem(AUTH_TOKEN_KEY);
+            if (token) {
+                // Call backend to revoke session
+                await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Logout API call failed:', error);
+            // Continue with local logout even if API fails
+        } finally {
+            // Always clear local state
+            setUser(null);
+            localStorage.removeItem(CURRENT_USER_KEY);
+            localStorage.removeItem(AUTH_TOKEN_KEY);
+        }
     };
 
     const refreshToken = async () => {
