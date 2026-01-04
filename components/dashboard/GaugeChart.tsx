@@ -107,9 +107,9 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
         <div className="px-3 relative">
             {/* Header with Title and Optional Actions */}
             {(title || headerActions) && (
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-1">
                     {title && <h3 className="text-sm font-semibold text-slate-700">{title}</h3>}
-                    {headerActions}
+                    {headerActions && <div className="flex items-center">{headerActions}</div>}
                 </div>
             )}
 
