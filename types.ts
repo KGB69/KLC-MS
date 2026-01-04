@@ -534,6 +534,12 @@ export interface UserSession {
   isCurrent: boolean;
   lastActive: string;
   createdAt: string;
+  // Verbose tracking fields
+  browserVersion?: string;
+  osVersion?: string;
+  screenResolution?: string;
+  timezone?: string;
+  requestCount?: number;
 }
 
 export interface AdminUser {

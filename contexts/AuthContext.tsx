@@ -41,10 +41,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const login = async (credentials: LoginCredentials) => {
+        // Collect device details
+        const deviceDetails = {
+            screenResolution: `${window.screen.width}x${window.screen.height}`,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+        };
+
         const response = await fetch('/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(credentials),
+            body: JSON.stringify({ ...credentials, deviceDetails }),
         });
 
         if (!response.ok) {

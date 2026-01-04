@@ -11,6 +11,7 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ dataStore }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [currentTime, setCurrentTime] = useState(new Date());
+    const [expandedSessionId, setExpandedSessionId] = useState<string | null>(null);
 
     const fetchSessions = async () => {
         setIsLoading(true);
@@ -145,6 +146,7 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ dataStore }) => {
                     <table className="w-full">
                         <thead>
                             <tr className="border-b border-slate-200">
+                                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700 w-8"></th>
                                 <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Device</th>
                                 <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Browser & OS</th>
                                 <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">IP Address</th>
@@ -155,71 +157,123 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ dataStore }) => {
                         </thead>
                         <tbody>
                             {sessions.map(session => (
-                                <tr
-                                    key={session.id}
-                                    className={`border-b border-slate-100 hover:bg-slate-50 transition-colors ${session.isCurrent ? 'bg-green-50' : ''
-                                        }`}
-                                >
-                                    <td className="py-3 px-4">
-                                        <div className="flex items-center space-x-2">
-                                            <span className="text-2xl">{getDeviceIcon(session.deviceName)}</span>
-                                            <span className="font-medium text-slate-800">{session.deviceName}</span>
-                                        </div>
-                                    </td>
-                                    <td className="py-3 px-4 text-sm text-slate-600">
-                                        {session.browser} • {session.os}
-                                    </td>
-                                    <td className="py-3 px-4 text-sm text-slate-500 font-mono">
-                                        {session.ipAddress}
-                                    </td>
-                                    <td className="py-3 px-4">
-                                        <div className="text-sm">
-                                            {session.isCurrent ? (
-                                                <span className="text-green-600 font-medium">⚡ Active now</span>
-                                            ) : (
-                                                <span className="text-slate-600">{formatActiveDuration(session.lastActive)}</span>
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td className="py-3 px-4">
-                                        {session.isCurrent ? (
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                ✓ This Device
-                                            </span>
-                                        ) : (() => {
-                                            const status = getSessionStatus(session.lastActive, session.isCurrent);
-                                            if (status === 'active') {
-                                                return (
-                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                        🟢 Active
-                                                    </span>
-                                                );
-                                            } else if (status === 'stale') {
-                                                return (
-                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                                        🟡 Stale
-                                                    </span>
-                                                );
-                                            } else {
-                                                return (
-                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
-                                                        ⚪ Inactive
-                                                    </span>
-                                                );
-                                            }
-                                        })()}
-                                    </td>
-                                    <td className="py-3 px-4 text-right">
-                                        {!session.isCurrent && (
+                                <React.Fragment key={session.id}>
+                                    <tr
+                                        className={`border-b border-slate-100 hover:bg-slate-50 transition-colors ${session.isCurrent ? 'bg-green-50' : ''
+                                            }`}
+                                    >
+                                        {/* Expand/Collapse Button */}
+                                        <td className="py-3 px-4">
                                             <button
-                                                onClick={() => handleRevokeSession(session.id)}
-                                                className="px-3 py-1 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+                                                onClick={() => setExpandedSessionId(expandedSessionId === session.id ? null : session.id)}
+                                                className="text-slate-400 hover:text-slate-600 transition-colors"
+                                                aria-expanded={expandedSessionId === session.id}
+                                                aria-controls={`session-details-${session.id}`}
                                             >
-                                                Revoke
+                                                {expandedSessionId === session.id ? '▼' : '▶'}
                                             </button>
-                                        )}
-                                    </td>
-                                </tr>
+                                        </td>
+
+                                        {/* Device */}
+                                        <td className="py-3 px-4">
+                                            <div className="flex items-center space-x-2">
+                                                <span className="text-2xl">{getDeviceIcon(session.deviceName)}</span>
+                                                <span className="font-medium text-slate-800">{session.deviceName}</span>
+                                            </div>
+                                        </td>
+
+                                        {/* Browser & OS */}
+                                        <td className="py-3 px-4 text-sm text-slate-600">
+                                            {session.browserVersion ? `${session.browser} ${session.browserVersion}` : session.browser} • {session.osVersion ? `${session.os} ${session.osVersion}` : session.os}
+                                        </td>
+
+                                        {/* Remaining cells stay the same */}
+                                        <td className="py-3 px-4 text-sm text-slate-500 font-mono">
+                                            {session.ipAddress}
+                                        </td>
+                                        <td className="py-3 px-4">
+                                            <div className="text-sm">
+                                                {session.isCurrent ? (
+                                                    <span className="text-green-600 font-medium">⚡ Active now</span>
+                                                ) : (
+                                                    <span className="text-slate-600">{formatActiveDuration(session.lastActive)}</span>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="py-3 px-4">
+                                            {session.isCurrent ? (
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                    ✓ This Device
+                                                </span>
+                                            ) : (() => {
+                                                const status = getSessionStatus(session.lastActive, session.isCurrent);
+                                                if (status === 'active') {
+                                                    return (
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                            🟢 Active
+                                                        </span>
+                                                    );
+                                                } else if (status === 'stale') {
+                                                    return (
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                            🟡 Stale
+                                                        </span>
+                                                    );
+                                                } else {
+                                                    return (
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                                                            ⚪ Inactive
+                                                        </span>
+                                                    );
+                                                }
+                                            })()}
+                                        </td>
+                                        <td className="py-3 px-4 text-right">
+                                            {!session.isCurrent && (
+                                                <button
+                                                    onClick={() => handleRevokeSession(session.id)}
+                                                    className="px-3 py-1 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+                                                >
+                                                    Revoke
+                                                </button>
+                                            )}
+                                        </td>
+                                    </tr>
+
+                                    {/* Expandable Detail Row */}
+                                    {expandedSessionId === session.id && (
+                                        <tr id={`session-details-${session.id}`} className="bg-slate-50">
+                                            <td colSpan={7} className="py-4 px-6">
+                                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                                                    <div>
+                                                        <span className="font-semibold text-slate-700">Browser Version:</span>
+                                                        <p className="text-slate-600">{session.browserVersion || 'N/A'}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="font-semibold text-slate-700">OS Version:</span>
+                                                        <p className="text-slate-600">{session.osVersion || 'N/A'}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="font-semibold text-slate-700">Screen Resolution:</span>
+                                                        <p className="text-slate-600">{session.screenResolution || 'N/A'}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="font-semibold text-slate-700">Timezone:</span>
+                                                        <p className="text-slate-600">{session.timezone || 'N/A'}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="font-semibold text-slate-700">Login Time:</span>
+                                                        <p className="text-slate-600">{new Date(session.createdAt).toLocaleString()}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="font-semibold text-slate-700">Session Duration:</span>
+                                                        <p className="text-slate-600">{formatActiveDuration(session.createdAt)}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </React.Fragment>
                             ))}
                         </tbody>
                     </table>
