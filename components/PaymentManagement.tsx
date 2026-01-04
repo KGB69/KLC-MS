@@ -109,6 +109,7 @@ const PaymentManagement: React.FC<PaymentManagementProps> = ({ dataStore }) => {
 
   const showForm = () => {
     setEditingPayment(null);
+    setDataVersion(v => v + 1); // Refresh client data to get latest fees
     setIsFormVisible(true);
   };
 

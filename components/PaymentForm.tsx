@@ -146,25 +146,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ onSubmit, onCancel, initialDa
           </div>
         </div>
 
-        {formData.clientId && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
-            <div className="text-center">
-              <p className="text-sm font-medium text-slate-600">Outstanding Balance</p>
-              {isLoadingBalance ? (
-                <div className="animate-pulse bg-slate-200 h-7 w-24 mx-auto mt-1 rounded-md"></div>
-              ) : (
-                <p className="text-xl font-bold text-brand-secondary tracking-tight">{formatCurrency(outstandingBalance, formData.currency)}</p>
-              )}
-            </div>
-            <div className="text-center">
-              <p className="text-sm font-medium text-slate-600">New Balance After Payment</p>
-              <p className={`text-xl font-bold tracking-tight ${newBalance < 0 ? 'text-red-600' : 'text-green-600'}`}>
-                {formatCurrency(newBalance, formData.currency)}
-              </p>
-            </div>
-          </div>
-        )}
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label htmlFor="amount" className="block text-sm font-medium text-slate-600 mb-1">Amount Paid</label>
