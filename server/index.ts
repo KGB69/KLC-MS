@@ -122,7 +122,47 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
         if (!user || !(await bcrypt.compare(password, user.password_hash))) {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
-        const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
+
+        // Parse device information from user-agent  
+        const userAgent = req.headers['user-agent'] || '';
+        // Simple parser for common browsers and OS
+        const browserMatch = userAgent.match(/(Chrome|Firefox|Safari|Edge|Opera|MSIE|Trident)/);
+        const osMatch = userAgent.match(/(Windows|Mac OS|Linux|Android|iOS)/);
+        const browser = browserMatch ? browserMatch[1] : 'Unknown Browser';
+        const os = osMatch ? osMatch[1] : 'Unknown OS';
+        const deviceName = `${browser} on ${os}`;
+        const ipAddress = req.ip || req.socket.remoteAddress || 'unknown';
+
+        // Create unique session token
+        const sessionToken = jwt.sign(
+            { id: user.id, username: user.username, timestamp: Date.now() },
+            JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        // Create session record
+        const sessionResult = await query(
+            `INSERT INTO user_sessions (user_id, session_token, device_name, browser, os, ip_address, user_agent)
+             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+            [
+                user.id,
+                sessionToken,
+                deviceName,
+                browser,
+                os,
+                ipAddress,
+                userAgent
+            ]
+        );
+        const sessionId = sessionResult.rows[0].id;
+
+        // Create JWT with sessionId
+        const token = jwt.sign(
+            { id: user.id, username: user.username, sessionId },
+            JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
         const { password_hash, ...userWithoutPassword } = user;
         res.json(toCamel({ user: userWithoutPassword, token }));
     } catch (err) {
@@ -142,6 +182,138 @@ app.post('/api/auth/refresh', authenticateToken, async (req: AuthRequest, res: R
         res.status(500).json({ message: 'Token refresh failed' });
     }
 });
+
+// --- Session Management Endpoints ---
+
+// GET /api/sessions - List user's active sessions
+app.get('/api/sessions', authenticateToken, async (req: AuthRequest, res: Response) => {
+    try {
+        const currentToken = req.headers['authorization']?.split(' ')[1];
+        const result = await query(
+            `SELECT id, device_name, browser, os, ip_address, last_active, created_at, 
+                    (session_token = $2) as is_current
+             FROM user_sessions 
+             WHERE user_id = $1 AND is_active = true 
+             ORDER BY last_active DESC`,
+            [req.user.id, currentToken]
+        );
+        res.json(toCamel(result.rows));
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to fetch sessions' });
+    }
+});
+
+// DELETE /api/sessions/:id - Revoke a specific session
+app.delete('/api/sessions/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    try {
+        // Don't allow revoking current session
+        const checkResult = await query('SELECT session_token FROM user_sessions WHERE id = $1', [id]);
+        const currentToken = req.headers['authorization']?.split(' ')[1];
+
+        if (checkResult.rows[0]?.session_token === currentToken) {
+            return res.status(400).json({ message: 'Cannot revoke current session. Use logout instead.' });
+        }
+
+        await query(
+            `UPDATE user_sessions 
+             SET is_active = false, revoked_at = CURRENT_TIMESTAMP, revoked_by = $1 
+             WHERE id = $2 AND user_id = $1`,
+            [req.user.id, id]
+        );
+        res.json({ message: 'Session revoked successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to revoke session' });
+    }
+});
+
+// DELETE /api/sessions/all-others - Revoke all except current
+app.delete('/api/sessions/all-others', authenticateToken, async (req: AuthRequest, res: Response) => {
+    try {
+        const currentToken = req.headers['authorization']?.split(' ')[1];
+        await query(
+            `UPDATE user_sessions 
+             SET is_active = false, revoked_at = CURRENT_TIMESTAMP, revoked_by = $1 
+             WHERE user_id = $1 AND session_token != $2 AND is_active = true`,
+            [req.user.id, currentToken]
+        );
+        res.json({ message: 'All other sessions revoked successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to revoke sessions' });
+    }
+});
+
+// Admin: GET /api/admin/users
+app.get('/api/admin/users', authenticateToken, async (req: AuthRequest, res: Response) => {
+    try {
+        const userCheck = await query('SELECT role FROM users WHERE id = $1', [req.user.id]);
+        if (userCheck.rows[0]?.role !== 'admin') {
+            return res.status(403).json({ message: 'Admin access required' });
+        }
+
+        const result = await query(
+            `SELECT u.id, u.username, u.email, u.role, u.created_at,
+                    COUNT(s.id) FILTER (WHERE s.is_active = true) as active_sessions
+             FROM users u
+             LEFT JOIN user_sessions s ON u.id = s.user_id
+             GROUP BY u.id
+             ORDER BY u.created_at DESC`
+        );
+        res.json(toCamel(result.rows));
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to fetch users' });
+    }
+});
+
+// Admin: GET /api/admin/users/:userId/sessions
+app.get('/api/admin/users/:userId/sessions', authenticateToken, async (req: AuthRequest, res: Response) => {
+    const { userId } = req.params;
+    try {
+        const userCheck = await query('SELECT role FROM users WHERE id = $1', [req.user.id]);
+        if (userCheck.rows[0]?.role !== 'admin') {
+            return res.status(403).json({ message: 'Admin access required' });
+        }
+
+        const result = await query(
+            `SELECT id, device_name, browser, os, ip_address, is_active, last_active, created_at, revoked_at
+             FROM user_sessions 
+             WHERE user_id = $1 
+             ORDER BY last_active DESC`,
+            [userId]
+        );
+        res.json(toCamel(result.rows));
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to fetch sessions' });
+    }
+});
+
+// Admin: DELETE /api/admin/sessions/:sessionId
+app.delete('/api/admin/sessions/:sessionId', authenticateToken, async (req: AuthRequest, res: Response) => {
+    const { sessionId } = req.params;
+    try {
+        const userCheck = await query('SELECT role FROM users WHERE id = $1', [req.user.id]);
+        if (userCheck.rows[0]?.role !== 'admin') {
+            return res.status(403).json({ message: 'Admin access required' });
+        }
+
+        await query(
+            `UPDATE user_sessions 
+             SET is_active = false, revoked_at = CURRENT_TIMESTAMP, revoked_by = $1 
+             WHERE id = $2`,
+            [req.user.id, sessionId]
+        );
+        res.json({ message: 'Session revoked successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed  to revoke session' });
+    }
+});
+
 
 // --- Prospect Routes ---
 
@@ -653,6 +825,27 @@ const runMigrations = async () => {
         await query('ALTER TABLE prospects ADD COLUMN IF NOT EXISTS interpretation_total_fee NUMERIC DEFAULT 0');
         await query('UPDATE prospects SET interpretation_total_fee = 0 WHERE interpretation_total_fee IS NULL');
 
+        // 5. Create user_sessions table for device/session management
+        await query(`
+            CREATE TABLE IF NOT EXISTS user_sessions (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                session_token TEXT NOT NULL UNIQUE,
+                device_name TEXT,
+                browser TEXT,
+                os TEXT,
+                ip_address TEXT,
+                user_agent TEXT,
+                is_active BOOLEAN DEFAULT true,
+                last_active TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                revoked_at TIMESTAMP WITH TIME ZONE,
+                revoked_by UUID REFERENCES users(id)
+            )
+        `);
+        await query('CREATE INDEX IF NOT EXISTS idx_user_sessions_user_id ON user_sessions(user_id)');
+        await query('CREATE INDEX IF NOT EXISTS idx_user_sessions_token ON user_sessions(session_token)');
+        await query('CREATE INDEX IF NOT EXISTS idx_user_sessions_active ON user_sessions(is_active)');
         console.log('✅ Migrations successful');
     } catch (err) {
         console.error('❌ Migration failed:', err);
