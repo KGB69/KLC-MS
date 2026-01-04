@@ -642,6 +642,13 @@ const runMigrations = async () => {
         // Then change column type
         await query('ALTER TABLE follow_up_actions ALTER COLUMN assigned_to TYPE TEXT');
 
+        // 3. Ensure fees column exists in students (for balance calculation)
+        await query('ALTER TABLE students ADD COLUMN IF NOT EXISTS fees NUMERIC');
+
+        // 4. Ensure fee columns exist in prospects (for balance calculation)
+        await query('ALTER TABLE prospects ADD COLUMN IF NOT EXISTS translation_total_fee NUMERIC');
+        await query('ALTER TABLE prospects ADD COLUMN IF NOT EXISTS interpretation_total_fee NUMERIC');
+
         console.log('✅ Migrations successful');
     } catch (err) {
         console.error('❌ Migration failed:', err);
