@@ -118,7 +118,7 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ dataStore }) => {
                                     <div className="flex items-center space-x-2">
                                         <h3 className="font-semibold text-slate-800">{currentSession.deviceName}</h3>
                                         <span className="px-2 py-0.5 text-xs font-medium text-green-700 bg-green-100 rounded-full">
-                                            Current Device
+                                            ✓ This Device
                                         </span>
                                     </div>
                                     <p className="text-sm text-slate-600 mt-1">
@@ -127,8 +127,8 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ dataStore }) => {
                                     <p className="text-xs text-slate-500 mt-1">
                                         IP: {currentSession.ipAddress}
                                     </p>
-                                    <p className="text-xs text-slate-500">
-                                        Active now
+                                    <p className="text-xs text-green-600 font-medium">
+                                        ⚡ Active now (viewing this page)
                                     </p>
                                 </div>
                             </div>
