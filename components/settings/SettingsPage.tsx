@@ -4,6 +4,7 @@ import { exportAllData, downloadJSON, uploadToServer } from '../../services/data
 import { importData, downloadFromServer } from '../../services/dataImportService';
 import StorageDashboard from './StorageDashboard';
 import BackupSettings from './BackupSettings';
+import SessionManagement from './SessionManagement';
 
 interface SettingsPageProps {
     prospectStore: ProspectDataStore & StudentDataStore & ClassDataStore & PaymentDataStore & ExpenditureDataStore;
@@ -195,6 +196,11 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ prospectStore }) => {
             {/* Auto-Backup Settings */}
             <div className="mb-6">
                 <BackupSettings prospectStore={prospectStore} />
+            </div>
+
+            {/* Active Sessions Management */}
+            <div className="mb-6">
+                <SessionManagement dataStore={prospectStore} />
             </div>
 
             {/* Info Section */}
