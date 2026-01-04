@@ -4,7 +4,7 @@ import {
   SearchCriteria, Communication, CommunicationFormData, ProspectStatus,
   ProspectDataStore, StudentDataStore, ClassDataStore, PaymentDataStore,
   ExpenditureDataStore, ClassScheduleDataStore, ClassScheduleEvent,
-  ClassScheduleFormData, ClassEnrollment
+  ClassScheduleFormData, ClassEnrollment, UserSession, AdminUser
 } from '../types';
 
 const API_BASE_URL = '/api';
@@ -487,5 +487,57 @@ export class ApiProspectDataStore implements
       body: JSON.stringify({ status })
     });
     return response.ok;
+  }
+
+  // --- Session Management Methods ---
+
+  async getSessions(): Promise<UserSession[]> {
+    const response = await fetch(`${API_BASE_URL}/sessions`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch sessions');
+    return response.json();
+  }
+
+  async revokeSession(sessionId: string): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to revoke session');
+  }
+
+  async revokeAllOtherSessions(): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/sessions/all-others`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to revoke sessions');
+  }
+
+  // --- Admin Methods ---
+
+  async getAdminUsers(): Promise<AdminUser[]> {
+    const response = await fetch(`${API_BASE_URL}/admin/users`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch users');
+    return response.json();
+  }
+
+  async getAdminUserSessions(userId: string): Promise<UserSession[]> {
+    const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/sessions`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch user sessions');
+    return response.json();
+  }
+
+  async revokeAdminSession(sessionId: string): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/admin/sessions/${sessionId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to revoke session');
   }
 }

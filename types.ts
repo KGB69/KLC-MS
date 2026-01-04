@@ -523,3 +523,24 @@ export interface ClassScheduleDataStore {
   getClassEnrollments(classId: string): Promise<ClassEnrollment[]>;
   markAttendance(enrollmentId: string, status: 'present' | 'absent' | 'late'): Promise<boolean>;
 }
+
+// Session Management Types
+export interface UserSession {
+  id: string;
+  deviceName: string;
+  browser: string;
+  os: string;
+  ipAddress: string;
+  isCurrent: boolean;
+  lastActive: string;
+  createdAt: string;
+}
+
+export interface AdminUser {
+  id: string;
+  username: string;
+  email: string;
+  role: 'user' | 'admin';
+  createdAt: string;
+  activeSessions: number;
+}
