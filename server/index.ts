@@ -274,6 +274,38 @@ app.post('/api/auth/logout', authenticateToken, async (req: AuthRequest, res: Re
     }
 });
 
+// --- Creator Names Autocomplete ---
+
+// GET /api/creator-names - Fetch creator names sorted by usage frequency
+app.get('/api/creator-names', authenticateToken, async (req: AuthRequest, res: Response) => {
+    try {
+        const result = await query(`
+            SELECT created_by_username as name, COUNT(*) as usage_count
+            FROM (
+                SELECT created_by_username FROM prospects WHERE created_by_username IS NOT NULL AND created_by_username != ''
+                UNION ALL
+                SELECT created_by_username FROM students WHERE created_by_username IS NOT NULL AND created_by_username != ''
+                UNION ALL
+                SELECT created_by_username FROM classes WHERE created_by_username IS NOT NULL AND created_by_username != ''
+                UNION ALL
+                SELECT created_by_username FROM payments WHERE created_by_username IS NOT NULL AND created_by_username != ''
+                UNION ALL
+                SELECT created_by_username FROM expenditures WHERE created_by_username IS NOT NULL AND created_by_username != ''
+                UNION ALL
+                SELECT created_by_username FROM communications WHERE created_by_username IS NOT NULL AND created_by_username != ''
+            ) combined
+            GROUP BY name
+            ORDER BY usage_count DESC
+            LIMIT 50
+        `);
+
+        res.json(toCamel({ names: result.rows }));
+    } catch (err) {
+        console.error('Error fetching creator names:', err);
+        res.status(500).json({ message: 'Failed to fetch creator names' });
+    }
+});
+
 // --- Session Management Endpoints ---
 
 // GET /api/sessions - List user's active sessions
