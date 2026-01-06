@@ -1,0 +1,152 @@
+// Session Management Endpoints - Add after auth endpoints
+
+// GET /api/sessions - List user's active sessions
+app.get('/api/sessions', authenticateToken, async (req: AuthRequest, res: Response) => {
+    try {
+        const result = await query(
+            `SELECT id, device_name, browser, os, ip_address, last_active, created_at, 
+                    (session_token = $2) as is_current
+             FROM user_sessions 
+             WHERE user_id = $1 AND is_active = true 
+             ORDER BY last_active DESC`,
+            [req.user.id, req.headers['authorization']?.split(' ')[1]]
+        );
+        res.json(toCamel(result.rows));
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to fetch sessions' });
+    }
+});
+
+// DELETE /api/sessions/:id - Revoke a specific session
+app.delete('/api/sessions/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    try {
+        // Don't allow revoking current session via this endpoint
+        const checkResult = await query('SELECT session_token FROM user_sessions WHERE id = $1', [id]);
+        const currentToken = req.headers['authorization']?.split(' ')[1];
+        
+        if (checkResult.rows[0]?.session_token === currentToken) {
+            return res.status(400).json({ message: 'Cannot revoke current session. Use logout instead.' });
+        }
+
+        await query(
+            `UPDATE user_sessions 
+             SET is_active = false, revoked_at = CURRENT_TIMESTAMP, revoked_by = $1 
+             WHERE id = $2 AND user_id = $1`,
+            [req.user.id, id]
+        );
+        res.json({ message: 'Session revoked successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to revoke session' });
+    }
+});
+
+// DELETE /api/sessions/all - Revoke all other sessions except current
+app.delete('/api/sessions/all-others', authenticateToken, async (req: AuthRequest, res: Response) => {
+    try {
+        const currentToken = req.headers['authorization']?.split(' ')[1];
+        await query(
+            `UPDATE user_sessions 
+             SET is_active = false, revoked_at = CURRENT_TIMESTAMP, revoked_by = $1 
+             WHERE user_id = $1 AND session_token != $2 AND is_active = true`,
+            [req.user.id, currentToken]
+        );
+        res.json({ message: 'All other sessions revoked successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to revoke sessions' });
+    }
+});
+
+// POST /api/sessions/:id/rename - Rename a session
+app.post('/api/sessions/:id/rename', authenticateToken, async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    const { deviceName } = req.body;
+    try {
+        await query(
+            `UPDATE user_sessions 
+             SET device_name = $1 
+             WHERE id = $2 AND user_id = $3`,
+            [deviceName, id, req.user.id]
+        );
+        res.json({ message: 'Session renamed successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to rename session' });
+    }
+});
+
+// Admin endpoints - Only accessible by admin role users
+
+// GET /api/admin/users - List all users (admin only)
+app.get('/api/admin/users', authenticateToken, async (req: AuthRequest, res: Response) => {
+    try {
+        // Check if user is admin
+        const userCheck = await query('SELECT role FROM users WHERE id = $1', [req.user.id]);
+        if (userCheck.rows[0]?.role !== 'admin') {
+            return res.status(403).json({ message: 'Admin access required' });
+        }
+
+        const result = await query(
+            `SELECT u.id, u.username, u.email, u.role, u.created_at,
+                    COUNT(s.id) FILTER (WHERE s.is_active = true) as active_sessions
+             FROM users u
+             LEFT JOIN user_sessions s ON u.id = s.user_id
+             GROUP BY u.id
+             ORDER BY u.created_at DESC`
+        );
+        res.json(toCamel(result.rows));
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to fetch users' });
+    }
+});
+
+// GET /api/admin/users/:userId/sessions - View specific user's sessions (admin only)
+app.get('/api/admin/users/:userId/sessions', authenticateToken, async (req: AuthRequest, res: Response) => {
+    const { userId } = req.params;
+    try {
+        // Check if user is admin
+        const userCheck = await query('SELECT role FROM users WHERE id = $1', [req.user.id]);
+        if (userCheck.rows[0]?.role !== 'admin') {
+            return res.status(403).json({ message: 'Admin access required' });
+        }
+
+        const result = await query(
+            `SELECT id, device_name, browser, os, ip_address, is_active, last_active, created_at, revoked_at
+             FROM user_sessions 
+             WHERE user_id = $1 
+             ORDER BY last_active DESC`,
+            [userId]
+        );
+        res.json(toCamel(result.rows));
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to fetch sessions' });
+    }
+});
+
+// DELETE /api/admin/sessions/:sessionId - Revoke any session (admin override)
+app.delete('/api/admin/sessions/:sessionId', authenticateToken, async (req: AuthRequest, res: Response) => {
+    const { sessionId } = req.params;
+    try {
+        // Check if user is admin
+        const userCheck = await query('SELECT role FROM users WHERE id = $1', [req.user.id]);
+        if (userCheck.rows[0]?.role !== 'admin') {
+            return res.status(403).json({ message: 'Admin access required' });
+        }
+
+        await query(
+            `UPDATE user_sessions 
+             SET is_active = false, revoked_at = CURRENT_TIMESTAMP, revoked_by = $1 
+             WHERE id = $2`,
+            [req.user.id, sessionId]
+        );
+        res.json({ message: 'Session revoked successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to revoke session' });
+    }
+});
