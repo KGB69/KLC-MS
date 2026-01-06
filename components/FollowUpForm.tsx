@@ -47,15 +47,11 @@ const FollowUpForm: React.FC<FollowUpFormProps> = ({ onSubmit }) => {
             />
           </div>
           <div>
-            <label htmlFor="assignedTo" className="block text-sm font-medium text-slate-600 mb-1">Assigned To</label>
-            <input
-              type="text"
-              id="assignedTo"
-              name="assignedTo"
+            <CreatorAutocomplete
               value={formData.assignedTo}
-              onChange={handleChange}
+              onChange={(value) => setFormData({ ...formData, assignedTo: value })}
+              label="Assigned To"
               placeholder="e.g., Jane Doe"
-              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-primary focus:border-brand-primary"
             />
           </div>
         </div>
