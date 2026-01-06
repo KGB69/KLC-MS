@@ -313,6 +313,9 @@ export interface ProspectFormData {
   // Financial fields
   translationTotalFee?: number;
   interpretationTotalFee?: number;
+
+  // Creator tracking
+  createdBy?: string;
 }
 
 export interface StudentFormData {

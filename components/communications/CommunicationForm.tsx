@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CommunicationFormData, CommunicationType, CommunicationPriority, Communication } from '../../types';
+import CreatorAutocomplete from '../shared/CreatorAutocomplete';
 
 interface CommunicationFormProps {
     onSubmit: (data: CommunicationFormData) => void;
@@ -69,17 +70,11 @@ const CommunicationForm: React.FC<CommunicationFormProps> = ({ onSubmit, onCance
 
             {/* Assigned To */}
             <div>
-                <label htmlFor="assignedTo" className="block text-sm font-medium text-slate-700 mb-1">
-                    Assigned To <span className="text-red-500">*</span>
-                </label>
-                <input
-                    type="text"
-                    id="assignedTo"
-                    name="assignedTo"
+                <CreatorAutocomplete
                     value={formData.assignedTo}
-                    onChange={handleChange}
+                    onChange={(value) => setFormData({ ...formData, assignedTo: value })}
+                    label="Assigned To"
                     placeholder="Username or 'Everyone'"
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent"
                     required
                 />
                 <p className="text-xs text-slate-500 mt-1">Enter a username or type "Everyone" to assign to all team members</p>
