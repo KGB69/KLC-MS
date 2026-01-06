@@ -344,16 +344,18 @@ export interface StudentDetailsFormData {
   howHeardAboutUs: howHeardAboutUs;
   howHeardAboutUsOther?: string;
   fees: number;
+  createdBy?: string; // Who registered this student
 }
 
 export interface ClassFormData {
-  name: string;
+  name: string; // e.g., 'English Beginners - Mon/Wed Morning'
   language: string;
   level: ClassLevel;
   teacherId: string;
-  roomNumber?: string;
+  roomNumber: string;
   schedule: ClassSchedule[];
-  studentIds: string[];
+  studentIds: string[]; // Will hold array of enrolled student IDs
+  createdBy?: string; // Who created this class
 }
 
 export interface FollowUpFormData {
