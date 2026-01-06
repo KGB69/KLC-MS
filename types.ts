@@ -352,7 +352,7 @@ export interface ClassFormData {
   language: string;
   level: ClassLevel;
   teacherId: string;
-  roomNumber: string;
+  roomNumber?: string;
   schedule: ClassSchedule[];
   studentIds: string[]; // Will hold array of enrolled student IDs
   createdBy?: string; // Who created this class
