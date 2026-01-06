@@ -384,6 +384,7 @@ export interface ExpenditureFormData {
   description: string;
   category: ExpenditureCategory;
   paymentMethod: PaymentMethod;
+  recordedBy?: string; // Who recorded this expenditure
 }
 
 export interface SearchCriteria {

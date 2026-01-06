@@ -3,6 +3,7 @@ import { ExpenditureFormData, ExpenditureCategory, PaymentMethod, Expenditure, C
 import { getDefaultCurrency, getCurrencySymbol, getAllCurrencies, getCurrencyName } from '../utils/currency';
 import { formatDateForInput, getTodayDate } from '../utils/dateUtils';
 import Modal from './shared/Modal';
+import CreatorAutocomplete from './shared/CreatorAutocomplete';
 
 interface ExpenditureFormProps {
   onSubmit: (expenditure: ExpenditureFormData) => void;
@@ -20,6 +21,7 @@ const ExpenditureForm: React.FC<ExpenditureFormProps> = ({ onSubmit, onCancel, i
     description: '',
     category: ExpenditureCategory.Other,
     paymentMethod: PaymentMethod.Cash,
+    recordedBy: '',
   };
 
   const [formData, setFormData] = useState<ExpenditureFormData>(initialFormState);
@@ -34,6 +36,7 @@ const ExpenditureForm: React.FC<ExpenditureFormProps> = ({ onSubmit, onCancel, i
         description: initialData.description,
         category: initialData.category,
         paymentMethod: initialData.paymentMethod,
+        recordedBy: (initialData as any).recordedBy || '',
       });
     } else {
       setFormData(initialFormState);
@@ -147,6 +150,17 @@ const ExpenditureForm: React.FC<ExpenditureFormProps> = ({ onSubmit, onCancel, i
             required
           />
         </div>
+
+        <div>
+          <CreatorAutocomplete
+            value={formData.recordedBy || ''}
+            onChange={(value) => setFormData({ ...formData, recordedBy: value })}
+            label="Recorded By"
+            placeholder="Enter name..."
+            required
+          />
+        </div>
+
         <div>
           <label htmlFor="paymentMethod" className="block text-sm font-medium text-slate-600 mb-1">Payment Method</label>
           <select id="paymentMethod" name="paymentMethod" value={formData.paymentMethod} onChange={handleChange}
