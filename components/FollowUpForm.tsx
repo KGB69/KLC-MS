@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FollowUpFormData } from '../types';
+import CreatorAutocomplete from './shared/CreatorAutocomplete';
 
 interface FollowUpFormProps {
   onSubmit: (formData: FollowUpFormData) => void;
