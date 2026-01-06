@@ -3,6 +3,7 @@ import { PaymentFormData, PaymentMethod, ServiceType, Client, Payment, Currency,
 import { formatCurrency, getDefaultCurrency, getCurrencySymbol, getAllCurrencies, getCurrencyName } from '../utils/currency';
 import { formatDateForInput, getTodayDate } from '../utils/dateUtils';
 import Modal from './shared/Modal';
+import CreatorAutocomplete from './shared/CreatorAutocomplete';
 
 interface PaymentFormProps {
   onSubmit: (payment: PaymentFormData) => void;
@@ -24,6 +25,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ onSubmit, onCancel, initialDa
     service: ServiceType.LanguageTraining,
     paymentMethod: PaymentMethod.Cash,
     notes: '',
+    recordedBy: '', // Add recordedBy field
   };
 
   const [formData, setFormData] = useState<PaymentFormData>(initialFormState);
@@ -41,6 +43,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ onSubmit, onCancel, initialDa
         service: initialData.service,
         paymentMethod: initialData.paymentMethod,
         notes: initialData.notes || '',
+        recordedBy: (initialData as any).recordedBy || '', // Load recordedBy if editing
       });
     } else {
       setFormData(initialFormState);
@@ -206,6 +209,16 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ onSubmit, onCancel, initialDa
               <option key={s} value={s}>{s}</option>
             ))}
           </select>
+        </div>
+
+        <div>
+          <CreatorAutocomplete
+            value={formData.recordedBy || ''}
+            onChange={(value) => setFormData({ ...formData, recordedBy: value })}
+            label="Recorded By"
+            placeholder="Enter name..."
+            required
+          />
         </div>
 
         <div>

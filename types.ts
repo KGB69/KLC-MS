@@ -373,6 +373,7 @@ export interface PaymentFormData {
   balanceCurrency?: Currency;
   paymentMethod: PaymentMethod;
   notes?: string;
+  recordedBy?: string; // Who recorded this payment
 }
 
 export interface ExpenditureFormData {
