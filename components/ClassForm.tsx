@@ -3,6 +3,7 @@ import { ClassFormData, ClassLevel, DayOfWeek, ClassSchedule, Student } from '..
 import Modal from './shared/Modal';
 import StudentEnrollmentModal from './enrollment/StudentEnrollmentModal';
 import { IndexedDBProspectDataStore } from '../services/indexedDBProspectStore';
+import CreatorAutocomplete from './shared/CreatorAutocomplete';
 
 interface ClassFormProps {
   onSubmit: (classData: ClassFormData) => void;
@@ -19,6 +20,7 @@ const ClassForm: React.FC<ClassFormProps> = ({ onSubmit, onCancel }) => {
     roomNumber: '',
     schedule: [],
     studentIds: [], // Not editable in this form
+    createdBy: '',
   };
 
   const [formData, setFormData] = useState<ClassFormData>(initialFormState);
@@ -143,6 +145,15 @@ const ClassForm: React.FC<ClassFormProps> = ({ onSubmit, onCancel }) => {
               onChange={handleChange}
               placeholder="e.g., T-101"
               className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-primary focus:border-brand-primary"
+              required
+            />
+          </div>
+          <div>
+            <CreatorAutocomplete
+              value={formData.createdBy || ''}
+              onChange={(value) => setFormData({ ...formData, createdBy: value })}
+              label="Created By"
+              placeholder="Enter name..."
               required
             />
           </div>
