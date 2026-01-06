@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Prospect, StudentDetailsFormData, howHeardAboutUs } from '../types';
 import Modal from './shared/Modal';
+import CreatorAutocomplete from './shared/CreatorAutocomplete';
 
 interface StudentRegistrationFormProps {
   prospect: Prospect;
@@ -21,6 +22,7 @@ const StudentRegistrationForm: React.FC<StudentRegistrationFormProps> = ({ prosp
     howHeardAboutUs: howHeardAboutUs.GoogleSearch,
     howHeardAboutUsOther: '',
     fees: 0,
+    createdBy: '',
   };
 
   const [formData, setFormData] = useState<StudentDetailsFormData>(initialFormState);
@@ -209,6 +211,16 @@ const StudentRegistrationForm: React.FC<StudentRegistrationFormProps> = ({ prosp
             min="0"
             step="1000"
             className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-primary focus:border-brand-primary"
+            required
+          />
+        </div>
+
+        <div>
+          <CreatorAutocomplete
+            value={formData.createdBy || ''}
+            onChange={(value) => setFormData({ ...formData, createdBy: value })}
+            label="Registered By"
+            placeholder="Enter name..."
             required
           />
         </div>
